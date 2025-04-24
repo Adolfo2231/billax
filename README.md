@@ -6,17 +6,27 @@ It uses bank and transaction data along with an intelligent assistant to provide
 🔍 MVP Goals (Stage 1)
 
 ✅ Validate the financial pain points of users
+
 ✅ Connect with real users to gather feedback
+
 ✅ Define a scalable, modular MVP that solves a real problem
+
 ✅ Combine smart insights + real bank data + goal setting
+
 🧠 Core Features (planned for MVP)
 
 🏦 Bank Integration via Plaid – See all your accounts and cards in one place
+
 💬 Smart Financial Assistant – Ask questions about your spending and get financial advice
+
 💰 Dashboard – Visualize spending, income, and balances
+
 🎯 Savings Goals – Set and track custom goals
+
 📩 Notifications – Alerts for spending, bills, and savings tips
+
 💳 Payment Tracking via Stripe – Manage payments & subscriptions
+
 ✨ Technologies
 
 
