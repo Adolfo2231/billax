@@ -59,9 +59,8 @@ If you want to test, give feedback, or contribute — reach out via Issues or Di
 
 **Adolfo Rodriguez**  
 Student Software Engineer | Fintech & AI Enthusiast  
-📫 GitHub: [github.com/tuusuario](https://github.com/Adolfo2231)  
-💼 LinkedIn: [linkedin.com/in/tuusuario](https://www.linkedin.com/in/adolfo-rodriguez-22b178330/)  
-📧 adolfo@example.com
+📫 **[GitHub](https://github.com/Adolfo2231)**  
+💼 **[LinkedIn](https://www.linkedin.com/in/adolfo-rodriguez-22b178330/)**  
 
 ---
 
