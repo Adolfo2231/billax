@@ -83,4 +83,4 @@ Notes:
 Stripe.js + PaymentRequest API will be used
 Apple Pay requires domain verification
 HTTPS will be enforced
-Webhooks will handle payment confirmation
+Webhooks will handle payment confirmation 
