@@ -1,0 +1,8 @@
+# Flask Core
+Flask==3.0.0
+
+# Environment variables
+python-dotenv==1.0.0
+
+# Development
+pytest==7.4.3
