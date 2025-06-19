@@ -1,5 +1,6 @@
 from flask import Flask
 from .config import DevelopmentConfig
+from app.extensions import db
 
 
 def create_app(config_class=DevelopmentConfig):
@@ -10,8 +11,15 @@ def create_app(config_class=DevelopmentConfig):
     app.config.from_object(config_class)
     config_class.init_app(app)
     
+    # Inicializar extensiones
+    db.init_app(app)
+    
+    # Crear tablas automáticamente
+    with app.app_context():
+        db.create_all()
+    
     # Register routes
-    from .api.v1 import bp as api_bp
+    from .api.v1 import api_v1_bp as api_bp
     app.register_blueprint(api_bp, url_prefix='/api/v1')
     
     # Basic route for testing
