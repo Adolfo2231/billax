@@ -7,13 +7,9 @@ class Config:
     # Flask Configuration
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
     
-    # Environment
-    DEBUG = False
-    TESTING = False
-    
-    # Logging
-    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
-    LOG_FILE = os.environ.get('LOG_FILE', 'logs/billax.log')
+    # Database Configuration
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///billax.db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     @staticmethod
     def init_app(app):
