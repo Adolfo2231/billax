@@ -14,7 +14,7 @@ from flask_restx import Namespace, fields
 from app.facade.auth_facade import AuthFacade
 from flask_restx import Resource
 from typing import Dict, Any
-from app.repositories.user_repository import UserRepository
+from app.utils.decorators.error_handler import handle_errors
 
 
 # Create the authentication namespace
@@ -75,6 +75,7 @@ class Register(Resource):
     @auth_ns.response(400, "Validation error", error_model)
     @auth_ns.response(404, "User not found", error_model)
     @auth_ns.response(500, "Internal server error", error_model)
+    @handle_errors
     def post(self) -> Dict[str, Any]:
         """
         Register a new user.
