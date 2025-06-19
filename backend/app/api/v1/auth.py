@@ -12,7 +12,7 @@ from flask_restx import Namespace, fields, Resource
 from app.facade.auth_facade import AuthFacade
 from typing import Dict, Any
 from app.utils.decorators.error_handler import handle_errors
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required
 
 
 # Create the authentication namespace
@@ -205,3 +205,33 @@ class ResetPassword(Resource):
         data = auth_ns.payload
         auth_facade.reset_password(data["token"], data["new_password"])
         return {"message": "Password updated successfully"}
+    
+@auth_ns.route("/logout")
+class Logout(Resource):
+    """Endpoint for user logout."""
+    
+    @auth_ns.doc('logout')
+    @auth_ns.response(200, "Logout successful")
+    @auth_ns.response(401, "Invalid token", error_model)
+    @auth_ns.response(500, "Internal server error", error_model)
+    @jwt_required()
+    @handle_errors
+    def post(self) -> Dict[str, str]:
+        """
+        Logout user by blacklisting their token.
+        
+        Requires valid JWT token in Authorization header.
+        """
+        from flask import request
+        
+        # Get the complete token from the Authorization header
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            raise ValueError("Authorization header missing or invalid")
+        
+        token = auth_header.split(' ')[1]
+        
+        # Blacklist the token
+        auth_facade.logout_user(token)
+        
+        return {"message": "Logout successful"}
