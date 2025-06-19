@@ -8,8 +8,11 @@ It acts as an intermediary between the API layer and the repository layer.
 from typing import Dict, Any
 from app.repositories.user_repository import UserRepository
 from app.models.user import User
-from app.extensions.jwt import create_token
+from app.extensions.jwt import create_token, create_access_token
+from app.extensions.mail import send_password_reset_email
 from werkzeug.security import check_password_hash
+from datetime import timedelta
+from flask_jwt_extended import create_access_token
 
 
 class AuthFacade:
@@ -85,10 +88,70 @@ class AuthFacade:
             raise ValueError("Invalid credentials")
             
         # Generate token using flask_jwt_extended
-        token = create_token(user.id)
+        token = create_token(str(user.id))
         
         return {
             "message": "Login successful",
             "token": token,
             "user": user.to_dict()
         }
+
+    def request_password_reset(self, email: str) -> None:
+        """
+        Request a password reset for a user.
+        
+        Args:
+            email (str): Email address of the user requesting reset
+            
+        Note:
+            This method intentionally does not raise errors for non-existent emails
+            to prevent email enumeration attacks.
+        """
+        user = self.user_repository.get_by_email(email)
+        if user:
+            # Create a reset token valid for 1 hour
+            reset_token = create_access_token(
+                identity=str(user.id),
+                additional_claims={'type': 'reset'},
+                expires_delta=timedelta(hours=1)
+            )
+            # For testing: print token to console instead of sending email
+            print(f"\n=== PASSWORD RESET TOKEN FOR {email} ===")
+            print(f"Token: {reset_token}")
+            print(f"Reset URL: http://localhost:3000/reset-password?token={reset_token}")
+            print("==========================================\n")
+            
+            # Uncomment the line below when email is properly configured
+            # send_password_reset_email(email, reset_token)
+
+    def reset_password(self, token: str, new_password: str) -> None:
+        """
+        Reset a user's password using a reset token.
+        
+        Args:
+            token (str): The reset token from the email
+            new_password (str): The new password to set
+            
+        Raises:
+            ValueError: If token is invalid or expired
+        """
+        try:
+            # Verify and decode token
+            from flask_jwt_extended import decode_token
+            decoded = decode_token(token)
+            
+            # Verify it's a reset token (check at root level)
+            if decoded.get('type') != 'reset':
+                raise ValueError("Invalid reset token")
+                
+            # Get user (convert string back to int for database lookup)
+            user = self.user_repository.get_by_id(int(decoded['sub']))
+            if not user:
+                raise ValueError("User not found")
+                
+            # Update password
+            user.set_password(new_password)
+            self.user_repository.save(user)
+            
+        except Exception as e:
+            raise ValueError("Invalid or expired reset token")

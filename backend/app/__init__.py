@@ -1,6 +1,6 @@
 from flask import Flask
 from .config import DevelopmentConfig
-from app.extensions import db, migrate, jwt
+from app.extensions import db, migrate, jwt, mail
 
 
 def create_app(config_class=DevelopmentConfig):
@@ -11,12 +11,13 @@ def create_app(config_class=DevelopmentConfig):
     app.config.from_object(config_class)
     config_class.init_app(app)
     
-    # Inicializar extensiones
+    # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
+    mail.init_app(app)
     
-    # Crear tablas automáticamente
+    # Create tables automatically
     with app.app_context():
         db.create_all()
     
