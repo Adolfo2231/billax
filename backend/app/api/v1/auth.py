@@ -1,26 +1,24 @@
 """
-Authentication API endpoints for user registration, login, and logout.
+Authentication API endpoints for user registration, login, and password management.
 
 This module provides RESTful endpoints for user authentication, including:
 - User registration with validation
 - User login with JWT token generation
-- User logout with token invalidation
-
-The endpoints use Flask-RESTX for request parsing, validation, and documentation.
+- Password recovery and reset
+- Password change for authenticated users
 """
 
-from flask_restx import Namespace, fields
+from flask_restx import Namespace, fields, Resource
 from app.facade.auth_facade import AuthFacade
-from flask_restx import Resource
 from typing import Dict, Any
 from app.utils.decorators.error_handler import handle_errors
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
 # Create the authentication namespace
 auth_ns = Namespace("auth", description="User registration and authentication")
 
 # Create facade instance
-
 auth_facade = AuthFacade()
 
 # Define request/response models
@@ -59,6 +57,15 @@ error_model = auth_ns.model("Error", {
 login_model = auth_ns.model("Login", {
     "email": fields.String(required=True, example="john@example.com", description="User's email address"),
     "password": fields.String(required=True, example="secure123", description="User's password")
+})
+
+forgot_password_model = auth_ns.model("ForgotPassword", {
+    "email": fields.String(required=True, example="john@example.com", description="Email address to send reset link")
+})
+
+reset_password_model = auth_ns.model("ResetPassword", {
+    "token": fields.String(required=True, description="Password reset token from email"),
+    "new_password": fields.String(required=True, example="newSecurePass123", description="New password")
 })
 
 @auth_ns.route("/register")
@@ -158,3 +165,43 @@ class Login(Resource):
         """
         data = auth_ns.payload
         return auth_facade.login_user(data)
+
+@auth_ns.route("/forgot-password")
+class ForgotPassword(Resource):
+    """Endpoint for initiating password recovery process."""
+    
+    @auth_ns.doc('forgot_password')
+    @auth_ns.expect(forgot_password_model, validate=True)
+    @auth_ns.response(200, "Reset email sent")
+    @auth_ns.response(404, "Email not found", error_model)
+    @auth_ns.response(500, "Internal server error", error_model)
+    @handle_errors
+    def post(self) -> Dict[str, str]:
+        """
+        Request a password reset link.
+        
+        Sends an email with a password reset token if the email exists in the system.
+        """
+        data = auth_ns.payload
+        auth_facade.request_password_reset(data["email"])
+        return {"message": "If the email exists in our system, you will receive a password reset link"}
+
+@auth_ns.route("/reset-password")
+class ResetPassword(Resource):
+    """Endpoint for resetting password using token from email."""
+    
+    @auth_ns.doc('reset_password')
+    @auth_ns.expect(reset_password_model, validate=True)
+    @auth_ns.response(200, "Password reset successful")
+    @auth_ns.response(400, "Invalid token", error_model)
+    @auth_ns.response(500, "Internal server error", error_model)
+    @handle_errors
+    def post(self) -> Dict[str, str]:
+        """
+        Reset password using token.
+        
+        Validates the token and updates the user's password.
+        """
+        data = auth_ns.payload
+        auth_facade.reset_password(data["token"], data["new_password"])
+        return {"message": "Password updated successfully"}
