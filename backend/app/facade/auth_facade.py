@@ -139,7 +139,6 @@ class AuthFacade:
             # Verify and decode token
             from flask_jwt_extended import decode_token
             decoded = decode_token(token)
-            print(f"[DEBUG] Decoded token: {decoded}")
             
             # Verify it's a reset token (check at root level)
             if decoded.get('type') != 'reset':
@@ -155,5 +154,4 @@ class AuthFacade:
             self.user_repository.save(user)
             
         except Exception as e:
-            print(f"[DEBUG] Exception in reset_password: {e}")
-            raise ValueError(str(e))
+            raise ValueError("Invalid or expired reset token")
