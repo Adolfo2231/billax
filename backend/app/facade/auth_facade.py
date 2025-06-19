@@ -8,13 +8,15 @@ It acts as an intermediary between the API layer and the repository layer.
 from typing import Dict, Any
 from app.repositories.user_repository import UserRepository
 from app.models.user import User
+from app.extensions.jwt import create_token
+from werkzeug.security import check_password_hash
 
 
 class AuthFacade:
     """
     Facade for authentication operations.
     
-    This class orchestrates user registration operations by coordinating 
+    This class orchestrates user registration and authentication operations by coordinating 
     between the API and repository layers.
     
     Attributes:
@@ -56,3 +58,37 @@ class AuthFacade:
         user = self.user_repository.save(user)
         
         return user.to_dict()
+        
+    def login_user(self, data: dict) -> Dict[str, Any]:
+        """
+        Authenticate a user and generate a JWT token.
+        
+        Args:
+            data (dict): Login data including email and password.
+            
+        Returns:
+            Dict[str, Any]: Response containing token and user data.
+            
+        Raises:
+            ValueError: If credentials are invalid.
+        """
+        email = data["email"]
+        password = data["password"]
+        
+        # Get user by email
+        user = self.user_repository.get_by_email(email)
+        if not user:
+            raise ValueError("Invalid credentials")
+            
+        # Verify password
+        if not check_password_hash(user.password_hash, password):
+            raise ValueError("Invalid credentials")
+            
+        # Generate token using flask_jwt_extended
+        token = create_token(user.id)
+        
+        return {
+            "message": "Login successful",
+            "token": token,
+            "user": user.to_dict()
+        }

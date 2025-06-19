@@ -1,4 +1,3 @@
-
 """
 Authentication API endpoints for user registration, login, and logout.
 
@@ -55,6 +54,11 @@ register_response_model = auth_ns.model("RegisterResponse", {
 error_model = auth_ns.model("Error", {
     "error": fields.String(example="Invalid credentials"),
     "message": fields.String(example="The provided credentials are invalid")
+})
+
+login_model = auth_ns.model("Login", {
+    "email": fields.String(required=True, example="john@example.com", description="User's email address"),
+    "password": fields.String(required=True, example="secure123", description="User's password")
 })
 
 @auth_ns.route("/register")
@@ -114,3 +118,43 @@ class Register(Resource):
         """
         data = auth_ns.payload
         return auth_facade.register_user(data), 201
+
+@auth_ns.route("/login")
+class Login(Resource):
+    """
+    Endpoint for user login.
+    
+    This endpoint handles user authentication and returns a JWT token
+    that can be used for subsequent authenticated requests.
+    """
+    
+    @auth_ns.doc('login')
+    @auth_ns.expect(login_model, validate=True)
+    @auth_ns.response(200, "Login successful", token_model)
+    @auth_ns.response(401, "Invalid credentials", error_model)
+    @auth_ns.response(500, "Internal server error", error_model)
+    @handle_errors
+    def post(self) -> Dict[str, Any]:
+        """
+        Authenticate a user and return a JWT token.
+        
+        This endpoint validates the user credentials and, if valid,
+        generates and returns a JWT token for authentication.
+        
+        Args:
+            Request body (JSON):
+                - email (str): User's email address
+                - password (str): User's password
+                
+        Returns:
+            Dict[str, Any]: Response containing:
+                - message (str): Success message
+                - token (str): JWT token for authentication
+                - user (dict): Basic user information
+                
+        Raises:
+            HTTP 401: If credentials are invalid
+            HTTP 500: For server errors
+        """
+        data = auth_ns.payload
+        return auth_facade.login_user(data)
