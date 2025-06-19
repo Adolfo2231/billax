@@ -8,11 +8,11 @@ It acts as an intermediary between the API layer and the repository layer.
 from typing import Dict, Any
 from app.repositories.user_repository import UserRepository
 from app.models.user import User
-from app.extensions.jwt import create_token, create_access_token
+from app.extensions.jwt import create_token, create_access_token, blacklist_token
 from app.extensions.mail import send_password_reset_email
 from werkzeug.security import check_password_hash
-from datetime import timedelta
-from flask_jwt_extended import create_access_token
+from datetime import timedelta, datetime
+from flask_jwt_extended import create_access_token, decode_token
 
 
 class AuthFacade:
@@ -137,7 +137,6 @@ class AuthFacade:
         """
         try:
             # Verify and decode token
-            from flask_jwt_extended import decode_token
             decoded = decode_token(token)
             
             # Verify it's a reset token (check at root level)
@@ -155,3 +154,26 @@ class AuthFacade:
             
         except Exception as e:
             raise ValueError("Invalid or expired reset token")
+
+    def logout_user(self, token: str) -> None:
+        """
+        Logout a user by blacklisting their token.
+        
+        Args:
+            token (str): The JWT token to blacklist
+            
+        Raises:
+            ValueError: If token is invalid
+        """
+        try:
+            # Decode the token to get JTI and expiration
+            decoded = decode_token(token)
+            jti = decoded['jti']
+            user_id = int(decoded['sub'])
+            expires_at = datetime.fromtimestamp(decoded['exp'])
+            
+            # Add token to blacklist
+            blacklist_token(jti, user_id, expires_at)
+            
+        except Exception as e:
+            raise ValueError("Invalid token")
