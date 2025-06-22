@@ -1,10 +1,21 @@
 from functools import wraps
+from app.utils.plaid_exceptions import PlaidTokenError, PlaidDataSyncError, PlaidUserNotLinkedError, PlaidUserAlreadyLinkedError, PlaidUserNotFoundError
 
 def handle_errors(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         try:
             return f(*args, **kwargs)
+        except PlaidTokenError as e:
+            return ({'error': 'Plaid Token Error', 'message': str(e)}), 400
+        except PlaidDataSyncError as e:
+            return ({'error': 'Plaid Data Sync Error', 'message': str(e)}), 500
+        except PlaidUserNotLinkedError as e:
+            return ({'error': 'Plaid User Not Linked', 'message': str(e)}), 400
+        except PlaidUserAlreadyLinkedError as e:
+            return ({'error': 'Plaid User Already Linked', 'message': str(e)}), 400
+        except PlaidUserNotFoundError as e:
+            return ({'error': 'Plaid User Not Found', 'message': str(e)}), 400
         except ValueError as e:
             error_message = str(e).lower()
             
