@@ -6,7 +6,21 @@ def handle_errors(f):
         try:
             return f(*args, **kwargs)
         except ValueError as e:
-            return ({'error': 'Validation Error', 'message': str(e)}), 400
+            error_message = str(e).lower()
+            
+            # Check if it's an authentication/authorization error
+            auth_errors = [
+                'invalid credentials',
+                'invalid token',
+                'invalid or expired reset token',
+                'invalid reset token',
+                'user not found'
+            ]
+            
+            if any(auth_error in error_message for auth_error in auth_errors):
+                return ({'error': 'Authentication Error', 'message': str(e)}), 401
+            else:
+                return ({'error': 'Validation Error', 'message': str(e)}), 400
         except Exception as e:
             return ({'error': 'Internal Server Error', 'message': str(e)}), 500
     return decorated_function
