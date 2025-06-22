@@ -1,5 +1,8 @@
 from .base import Config
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
 class DevelopmentConfig(Config):
     """Development configuration."""
@@ -9,8 +12,7 @@ class DevelopmentConfig(Config):
     # Development specific settings
     FLASK_ENV = 'development'
     
-    # Database (SQLite for development)
-    # SQLALCHEMY_DATABASE_URI = 'sqlite:///billax_dev.db'
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
     
     # Logging
     LOG_LEVEL = 'DEBUG'
