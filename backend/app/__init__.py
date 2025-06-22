@@ -17,9 +17,6 @@ def create_app(config_class=DevelopmentConfig):
     jwt.init_app(app)
     mail.init_app(app)
     
-    # Create tables automatically
-    with app.app_context():
-        db.create_all()
     
     # Register routes
     from .api.v1 import api_v1_bp as api_bp
