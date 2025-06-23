@@ -14,6 +14,10 @@ error_model = plaid_ns.model("Error", {
     "message": fields.String(required=True, description="Error message")
 })
 
+public_token_model = plaid_ns.model("PublicToken", {
+    "token": fields.String(required=True, description="Plaid public token")
+})
+
 # Create facade instance
 plaid_facade = PlaidFacade()
 
@@ -28,3 +32,15 @@ class CreateLinkToken(Resource):
     def post(self):
         user_id = get_jwt_identity()
         return plaid_facade.create_link_token(user_id)
+    
+@plaid_ns.route("/create-public-token")
+class CreatePublicToken(Resource):
+    @plaid_ns.doc("create_public_token")
+    @plaid_ns.response(200, "Plaid public token created", public_token_model)
+    @plaid_ns.response(400, "Validation error", error_model)
+    @plaid_ns.response(500, "Internal server error", error_model)
+    @handle_errors
+    @jwt_required()
+    def post(self):
+        user_id = get_jwt_identity()
+        return plaid_facade.create_public_token(user_id)
