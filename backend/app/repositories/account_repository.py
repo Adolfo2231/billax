@@ -99,3 +99,21 @@ class AccountRepository:
             List[Account]: List of accounts matching the criteria.
         """
         return Account.query.filter_by(user_id=user_id, type=account_type, is_active=True).all()
+    
+    def delete_by_user_id(self, user_id: int) -> bool:
+        """
+        Delete all accounts for a specific user.
+        
+        Args:
+            user_id (int): The user ID.
+            
+        Returns:
+            bool: True if deleted successfully, False otherwise.
+        """
+        try:
+            Account.query.filter_by(user_id=user_id).delete()
+            db.session.commit()
+            return True
+        except Exception:
+            db.session.rollback()
+            return False
