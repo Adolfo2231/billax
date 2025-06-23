@@ -4,7 +4,7 @@ repositories/account_repository.py
 This module provides data access methods for Account entities.
 """
 
-from typing import List
+from typing import List, Optional
 from app.models.account import Account
 from app.extensions import db
 
@@ -72,4 +72,17 @@ class AccountRepository:
                 db.session.add(account)
         
         db.session.commit()
-        return accounts 
+        return accounts
+    
+    def get_by_id_and_user_id(self, account_id: int, user_id: int) -> Optional[Account]:
+        """
+        Get an account by its ID and user ID for security.
+        
+        Args:
+            account_id (int): The account ID.
+            user_id (int): The user ID.
+            
+        Returns:
+            Optional[Account]: The account if found and belongs to user, None otherwise.
+        """
+        return Account.query.filter_by(id=account_id, user_id=user_id, is_active=True).first()
