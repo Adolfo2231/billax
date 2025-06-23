@@ -58,14 +58,27 @@ error_model = accounts_ns.model("Error", {
 class Accounts(Resource):
     @accounts_ns.doc("get_accounts")
     @accounts_ns.response(200, "Accounts retrieved successfully", accounts_response_model)
-    @accounts_ns.response(400, "User not linked to Plaid", error_model)
-    @accounts_ns.response(404, "User not found", error_model)
+    @accounts_ns.response(404, "Accounts not found", error_model)
     @accounts_ns.response(500, "Internal server error", error_model)
     @handle_errors
     @jwt_required()
     def get(self):
         user_id = get_jwt_identity()
         accounts = accounts_facade.get_accounts(user_id)
+        return {"accounts": accounts}
+    
+@accounts_ns.route("/sync-accounts")
+class SyncAccounts(Resource):
+    @accounts_ns.doc("sync_accounts")
+    @accounts_ns.response(200, "Accounts retrieved successfully", accounts_response_model)
+    @accounts_ns.response(400, "User not linked to Plaid", error_model)
+    @accounts_ns.response(404, "User not found", error_model)
+    @accounts_ns.response(500, "Internal server error", error_model)
+    @handle_errors
+    @jwt_required()
+    def post(self):
+        user_id = get_jwt_identity()
+        accounts = accounts_facade.sync_accounts(user_id)
         return {"accounts": accounts}
     
 @accounts_ns.route("/<int:account_id>")
