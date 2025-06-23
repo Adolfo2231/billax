@@ -61,4 +61,15 @@ class ExchangePublicToken(Resource):
             raise ValueError("Missing public_token in request body")
         user_id = get_jwt_identity()
         return plaid_facade.exchange_public_token(user_id, public_token)
-
+    
+@plaid_ns.route("/disconnect")
+class Disconnect(Resource):
+    @plaid_ns.doc("disconnect")
+    @plaid_ns.response(200, "Plaid disconnected")
+    @plaid_ns.response(400, "Validation error", error_model)
+    @plaid_ns.response(500, "Internal server error", error_model)
+    @handle_errors
+    @jwt_required()
+    def post(self):
+        user_id = get_jwt_identity()
+        return plaid_facade.disconnect(user_id)
