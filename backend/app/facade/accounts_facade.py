@@ -61,4 +61,9 @@ class AccountsFacade:
         if not accounts:
             raise AccountNotFoundError()
         return [account.to_dict() for account in accounts]
+    
+    def delete_accounts(self, user_id: int):
+        """Delete all accounts for a user."""
+        self.account_repository.delete_by_user_id(user_id)
+        return {"message": "Accounts deleted successfully"}
 
