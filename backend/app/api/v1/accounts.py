@@ -42,3 +42,16 @@ class Accounts(Resource):
         user_id = get_jwt_identity()
         accounts = accounts_facade.get_accounts(user_id)
         return {"accounts": accounts}
+    
+@accounts_ns.route("/<int:account_id>")
+class Account(Resource):
+    @accounts_ns.doc("get_account")
+    @accounts_ns.response(200, "Account retrieved successfully", account_model)
+    @accounts_ns.response(404, "Account not found", error_model)
+    @accounts_ns.response(500, "Internal server error", error_model)
+    @handle_errors
+    @jwt_required()
+    def get(self, account_id):
+        user_id = get_jwt_identity()
+        account = accounts_facade.get_account_by_id(user_id, account_id)
+        return account
