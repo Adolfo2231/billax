@@ -28,3 +28,8 @@ class PlaidUserNotFoundError(PlaidException):
     """Exception raised when Plaid user is not found."""
     def __init__(self, message: str = "User not found"):
         super().__init__(message)
+
+class UserNotFoundError(PlaidException):
+    """Exception raised when user is not found."""
+    def __init__(self, message: str = "User not found"):
+        super().__init__(message)
