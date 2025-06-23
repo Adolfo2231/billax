@@ -186,7 +186,7 @@ def convert_dates(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
                 convert_dates([value])
     return data
 
-def get_accounts(access_token: str) -> List[Dict[str, Any]]:
+def sync_accounts(access_token: str) -> List[Dict[str, Any]]:
     """
     Retrieves account information from Plaid.
 
