@@ -9,7 +9,7 @@ from flask_restx import Api
 from app.api.v1.auth import auth_ns
 from app.api.v1.plaid import plaid_ns
 from app.api.v1.accounts import accounts_ns
-
+from app.api.v1.transaction import transaction_ns
 # Create the API v1 blueprint
 api_v1_bp = Blueprint('api_v1', __name__, url_prefix='/api/v1')
 
@@ -26,3 +26,4 @@ api = Api(
 api.add_namespace(auth_ns, path='/auth')
 api.add_namespace(plaid_ns, path='/plaid')
 api.add_namespace(accounts_ns, path='/accounts')
+api.add_namespace(transaction_ns, path='/transaction')
