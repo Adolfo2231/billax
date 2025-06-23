@@ -14,6 +14,9 @@ from app.utils.plaid_exceptions import PlaidTokenError, PlaidDataSyncError
 from plaid.model.sandbox_public_token_create_request import SandboxPublicTokenCreateRequest
 from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchangeRequest
 from plaid.model.accounts_get_request import AccountsGetRequest
+from plaid.model.transactions_get_request import TransactionsGetRequest
+from app.repositories.user_repository import UserRepository
+from app.utils.plaid_exceptions import PlaidDataSyncError, PlaidUserNotLinkedError, UserNotFoundError
 
 # Load environment variables
 load_dotenv()
@@ -168,23 +171,18 @@ def exchange_public_token(public_token: str) -> str:
     except ApiException as e:
         raise PlaidTokenError(f"Failed to exchange public token: {str(e)}")
 
-def convert_dates(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def convert_dates(data):
     """
-    Converts datetime objects to string format in a list of dictionaries.
-    
-    Args:
-        data (List[Dict[str, Any]]): List of dictionaries containing data with dates.
-        
-    Returns:
-        List[Dict[str, Any]]: List with dates converted to ISO format strings.
+    Recursivamente convierte objetos datetime y date a string en cualquier estructura.
     """
-    for item in data:
-        for key, value in item.items():
-            if isinstance(value, datetime.datetime):
-                item[key] = value.isoformat()
-            elif isinstance(value, dict):
-                convert_dates([value])
-    return data
+    if isinstance(data, dict):
+        return {k: convert_dates(v) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [convert_dates(item) for item in data]
+    elif isinstance(data, (datetime.datetime, datetime.date)):
+        return data.isoformat()
+    else:
+        return data
 
 def sync_accounts(access_token: str) -> List[Dict[str, Any]]:
     """
@@ -219,3 +217,139 @@ def sync_accounts(access_token: str) -> List[Dict[str, Any]]:
         
     except ApiException as e:
         raise PlaidDataSyncError(f"Failed to retrieve accounts: {str(e)}")
+
+def get_transactions(access_token: str, start_date: str = None, end_date: str = None, count: int = None) -> Dict[str, Any]:
+    """
+    Retrieves transaction information from Plaid.
+
+    Args:
+        access_token (str): The Plaid access token for the user.
+        start_date (str): Start date in YYYY-MM-DD format.
+        end_date (str): End date in YYYY-MM-DD format.
+        count (int): Number of transactions to retrieve (optional, if not specified gets all).
+
+    Returns:
+        Dict[str, Any]: Dictionary containing transactions and other metadata.
+
+    Raises:
+        PlaidDataSyncError: If there is an error retrieving transactions.
+
+    Example:
+        >>> transactions = get_transactions("access-sandbox-1234567890", "2024-03-01", "2024-03-31", 100)
+        >>> print(f"Retrieved {len(transactions['transactions'])} transactions")
+        Retrieved 100 transactions
+    """
+    try:
+        # Si no hay fechas, usar los últimos 90 días
+        if not end_date:
+            end_date_obj = datetime.date.today()
+        else:
+            end_date_obj = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
+        if not start_date:
+            # Por defecto, últimos 90 días
+            start_date_obj = end_date_obj - datetime.timedelta(days=90)
+        else:
+            start_date_obj = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
+        
+        all_transactions = []
+        has_more = True
+        offset = 0
+        
+        # Usar paginación para obtener todas las transacciones en el rango
+        while has_more:
+            # Si se especifica count, limitar la cantidad por request
+            request_count = 100  # Plaid max is 100 per request
+            if count is not None:
+                remaining = count - len(all_transactions)
+                if remaining <= 0:
+                    break
+                request_count = min(100, remaining)
+            
+            request = TransactionsGetRequest(
+                access_token=access_token,
+                start_date=start_date_obj,
+                end_date=end_date_obj,
+                options={
+                    'count': request_count,
+                    'offset': offset
+                }
+            )
+            response = client.transactions_get(request)
+            result = response.to_dict()
+            
+            transactions = result.get('transactions', [])
+            all_transactions.extend(transactions)
+            
+            has_more = result.get('has_more', False)
+            offset += len(transactions)
+            
+            # Si no hay más transacciones, parar
+            if not has_more:
+                break
+        
+        # Si se especifica count, limitar a esa cantidad
+        if count is not None:
+            all_transactions = all_transactions[:count]
+        
+        # Ordenar por fecha (más recientes primero)
+        all_transactions.sort(key=lambda x: x.get('date', ''), reverse=True)
+        
+        result = {
+            'accounts': result.get('accounts', []),
+            'transactions': all_transactions,
+            'total_transactions': len(all_transactions),
+            'has_more': has_more,
+            'request_id': result.get('request_id')
+        }
+        
+        return convert_dates(result)
+    except ApiException as e:
+        raise PlaidDataSyncError(f"Failed to retrieve transactions: {str(e)}")
+
+def sync_transactions(user_id: str, start_date: str, end_date: str, count: int = None) -> Dict[str, Any]:
+    """
+    Retrieves transaction information from Plaid for a user.
+
+    This method gets the user's access token and retrieves transactions from Plaid
+    for the specified date range. It does not perform any database operations.
+
+    Args:
+        user_id (str): The user ID.
+        start_date (str): Start date in YYYY-MM-DD format.
+        end_date (str): End date in YYYY-MM-DD format.
+        count (int): Number of transactions to retrieve (optional, if not specified gets all).
+
+    Returns:
+        Dict[str, Any]: Dictionary containing transactions and other metadata from Plaid.
+
+    Raises:
+        UserNotFoundError: If the user is not found.
+        PlaidUserNotLinkedError: If the user is not connected to Plaid.
+        PlaidDataSyncError: If there is an error retrieving transaction data.
+
+    Example:
+        >>> transactions = sync_transactions(
+        ...     "user-123",
+        ...     "2024-03-01",
+        ...     "2024-03-31"
+        ... )
+        >>> print(f"Retrieved {len(transactions['transactions'])} transactions")
+        Retrieved 50 transactions
+    """
+    try:
+        # Get user's access token
+        user = UserRepository().get_by_id(user_id)
+        if not user:
+            raise UserNotFoundError()
+        
+        if not user.plaid_access_token:
+            raise PlaidUserNotLinkedError()
+            
+        # Get transactions from Plaid
+        return get_transactions(user.plaid_access_token, start_date, end_date, count)
+        
+    except (UserNotFoundError, PlaidUserNotLinkedError, PlaidDataSyncError):
+        # Re-raise our domain exceptions
+        raise
+    except Exception as e:
+        raise PlaidDataSyncError(f"Failed to retrieve transactions: {str(e)}")
