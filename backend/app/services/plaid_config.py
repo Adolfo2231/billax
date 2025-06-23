@@ -1,5 +1,5 @@
 import os
-from typing import Dict, Any
+from typing import Dict, Any, List
 import datetime
 from datetime import timedelta
 from dotenv import load_dotenv
@@ -10,9 +10,10 @@ from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUse
 from plaid.model.products import Products
 from plaid.model.country_code import CountryCode
 from plaid.exceptions import ApiException
-from app.utils.plaid_exceptions import PlaidTokenError
+from app.utils.plaid_exceptions import PlaidTokenError, PlaidDataSyncError
 from plaid.model.sandbox_public_token_create_request import SandboxPublicTokenCreateRequest
 from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchangeRequest
+from plaid.model.accounts_get_request import AccountsGetRequest
 
 # Load environment variables
 load_dotenv()
@@ -166,3 +167,55 @@ def exchange_public_token(public_token: str) -> str:
         return response.to_dict()["access_token"]
     except ApiException as e:
         raise PlaidTokenError(f"Failed to exchange public token: {str(e)}")
+
+def convert_dates(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Converts datetime objects to string format in a list of dictionaries.
+    
+    Args:
+        data (List[Dict[str, Any]]): List of dictionaries containing data with dates.
+        
+    Returns:
+        List[Dict[str, Any]]: List with dates converted to ISO format strings.
+    """
+    for item in data:
+        for key, value in item.items():
+            if isinstance(value, datetime.datetime):
+                item[key] = value.isoformat()
+            elif isinstance(value, dict):
+                convert_dates([value])
+    return data
+
+def get_accounts(access_token: str) -> List[Dict[str, Any]]:
+    """
+    Retrieves account information from Plaid.
+
+    Args:
+        access_token (str): The Plaid access token for the user.
+
+    Returns:
+        List[Dict[str, Any]]: List of account information.
+
+    Raises:
+        PlaidDataSyncError: If there is an error retrieving accounts.
+
+    Example:
+        >>> accounts = get_accounts("access-sandbox-1234567890")
+        >>> for account in accounts:
+        ...     print(f"Account: {account['name']} - Balance: ${account['balances']['current']}")
+        Account: Checking - Balance: $1000.00
+        Account: Savings - Balance: $5000.00
+    """
+    try:
+        request = AccountsGetRequest(access_token=access_token)
+        response = client.accounts_get(request)
+        result = response.to_dict()
+        
+        # Extract accounts from response
+        accounts = result.get('accounts', [])
+        
+        # Convert all dates to string format
+        return convert_dates(accounts)
+        
+    except ApiException as e:
+        raise PlaidDataSyncError(f"Failed to retrieve accounts: {str(e)}")
