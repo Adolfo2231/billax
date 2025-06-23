@@ -67,3 +67,58 @@ class AccountsFacade:
         self.account_repository.delete_by_user_id(user_id)
         return {"message": "Accounts deleted successfully"}
 
+    def get_accounts_summary(self, user_id: int) -> Dict[str, Any]:
+        """Get a summary of all accounts for a user."""
+        accounts = self.account_repository.get_by_user_id(user_id)
+        if not accounts:
+            raise AccountNotFoundError()
+        
+        # Initialize summary structure
+        summary = {
+            "total_accounts": len(accounts),
+            "total_balance": 0.0,
+            "accounts_by_type": {},
+            "accounts_by_status": {
+                "active": {"count": 0, "total_balance": 0.0},
+                "pending": {"count": 0, "total_balance": 0.0}
+            },
+            "balance_trend": {
+                "available": 0.0,
+                "current": 0.0,
+                "limit": 0.0
+            }
+        }
+        
+        for account in accounts:
+            # Convert Decimal to float to avoid type conflicts
+            current_balance = float(account.current_balance or 0.0)
+            available_balance = float(account.available_balance or 0.0)
+            limit = float(account.limit or 0.0)
+            
+            # Add to total balance
+            summary["total_balance"] += current_balance
+            
+            # Group by account type
+            account_type = account.type
+            if account_type not in summary["accounts_by_type"]:
+                summary["accounts_by_type"][account_type] = {
+                    "count": 0,
+                    "total_balance": 0.0
+                }
+            summary["accounts_by_type"][account_type]["count"] += 1
+            summary["accounts_by_type"][account_type]["total_balance"] += current_balance
+            
+            # Group by status (active vs pending)
+            if current_balance >= 0:
+                summary["accounts_by_status"]["active"]["count"] += 1
+                summary["accounts_by_status"]["active"]["total_balance"] += current_balance
+            else:
+                summary["accounts_by_status"]["pending"]["count"] += 1
+                summary["accounts_by_status"]["pending"]["total_balance"] += current_balance
+            
+            # Balance trend
+            summary["balance_trend"]["available"] += available_balance
+            summary["balance_trend"]["current"] += current_balance
+            summary["balance_trend"]["limit"] += limit
+        
+        return summary
