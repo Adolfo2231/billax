@@ -33,3 +33,12 @@ class PlaidFacade:
         user.plaid_access_token = access_token
         self.user_repository.save(user)
         return {"access_token": access_token}
+    
+    def disconnect(self, user_id: int) -> None:
+        """Disconnect Plaid from the user."""
+        user = self.user_repository.get_by_id(user_id)
+        if not user:
+            raise PlaidUserNotFoundError()
+        user.plaid_access_token = None
+        self.user_repository.save(user)
+        return {"message": "Plaid disconnected"}
