@@ -1,11 +1,14 @@
 from functools import wraps
 from app.utils.plaid_exceptions import PlaidTokenError, PlaidDataSyncError, PlaidUserNotLinkedError, PlaidUserAlreadyLinkedError, PlaidUserNotFoundError
+from app.utils.accounts_exceptions import AccountNotFoundError
 
 def handle_errors(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         try:
             return f(*args, **kwargs)
+        except AccountNotFoundError as e:
+            return ({'error': 'Account Not Found', 'message': str(e)}), 404
         except PlaidTokenError as e:
             return ({'error': 'Plaid Token Error', 'message': str(e)}), 400
         except PlaidDataSyncError as e:
