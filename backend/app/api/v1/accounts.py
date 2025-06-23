@@ -55,3 +55,16 @@ class Account(Resource):
         user_id = get_jwt_identity()
         account = accounts_facade.get_account_by_id(user_id, account_id)
         return account
+    
+@accounts_ns.route("/<string:account_type>")
+class AccountsByType(Resource):
+    @accounts_ns.doc("get_accounts_by_type")
+    @accounts_ns.response(200, "Accounts retrieved successfully", accounts_response_model)
+    @accounts_ns.response(404, "Accounts not found", error_model)
+    @accounts_ns.response(500, "Internal server error", error_model)
+    @handle_errors
+    @jwt_required()
+    def get(self, account_type):
+        user_id = get_jwt_identity()
+        accounts = accounts_facade.get_accounts_by_type(user_id, account_type)
+        return {"accounts": accounts}
