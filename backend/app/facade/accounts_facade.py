@@ -4,6 +4,7 @@ from app.repositories.user_repository import UserRepository
 from app.repositories.account_repository import AccountRepository
 from app.models.account import Account
 from app.utils.plaid_exceptions import PlaidUserNotFoundError, PlaidUserNotLinkedError
+from app.utils.accounts_exceptions import AccountNotFoundError
 
 class AccountsFacade:
     def __init__(self):
@@ -46,4 +47,11 @@ class AccountsFacade:
         # Return accounts from database
         saved_accounts = self.account_repository.get_by_user_id(user_id)
         return [account.to_dict() for account in saved_accounts]
+    
+    def get_account_by_id(self, user_id: int, account_id: int) -> Dict[str, Any]:
+        """Get an account by its ID, ensuring it belongs to the user."""
+        account = self.account_repository.get_by_id_and_user_id(account_id, user_id)
+        if not account:
+            raise AccountNotFoundError()
+        return account.to_dict()
 
