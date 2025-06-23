@@ -1,5 +1,5 @@
 from typing import List, Dict, Any
-from app.services.plaid_config import get_accounts
+from app.services.plaid_config import sync_accounts
 from app.repositories.user_repository import UserRepository
 from app.repositories.account_repository import AccountRepository
 from app.models.account import Account
@@ -11,7 +11,7 @@ class AccountsFacade:
         self.user_repository = UserRepository()
         self.account_repository = AccountRepository()
 
-    def get_accounts(self, user_id: int) -> List[Dict[str, Any]]:
+    def sync_accounts(self, user_id: int) -> List[Dict[str, Any]]:
         """Get user's bank accounts from Plaid and sync to database."""
         user = self.user_repository.get_by_id(user_id)
         if not user:
@@ -20,7 +20,7 @@ class AccountsFacade:
             raise PlaidUserNotLinkedError("User is not linked to Plaid")
         
         # Get accounts from Plaid
-        plaid_accounts = get_accounts(user.plaid_access_token)
+        plaid_accounts = sync_accounts(user.plaid_access_token)
         
         # Convert Plaid data to Account models and save to database
         accounts_to_save = []
@@ -122,3 +122,10 @@ class AccountsFacade:
             summary["balance_trend"]["limit"] += limit
         
         return summary
+    
+    def get_accounts(self, user_id: int) -> List[Dict[str, Any]]:
+        """Get all accounts for a user."""
+        accounts = self.account_repository.get_by_user_id(user_id)
+        if not accounts:
+            raise AccountNotFoundError()
+        return [account.to_dict() for account in accounts]
