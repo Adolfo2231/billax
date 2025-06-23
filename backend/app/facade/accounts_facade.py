@@ -54,4 +54,11 @@ class AccountsFacade:
         if not account:
             raise AccountNotFoundError()
         return account.to_dict()
+    
+    def get_accounts_by_type(self, user_id: int, account_type: str) -> List[Dict[str, Any]]:
+        """Get accounts by type."""
+        accounts = self.account_repository.get_by_user_id_and_type(user_id, account_type)
+        if not accounts:
+            raise AccountNotFoundError()
+        return [account.to_dict() for account in accounts]
 
