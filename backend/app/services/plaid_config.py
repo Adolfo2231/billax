@@ -12,6 +12,7 @@ from plaid.model.country_code import CountryCode
 from plaid.exceptions import ApiException
 from app.utils.plaid_exceptions import PlaidTokenError
 from plaid.model.sandbox_public_token_create_request import SandboxPublicTokenCreateRequest
+from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchangeRequest
 
 # Load environment variables
 load_dotenv()
@@ -137,3 +138,31 @@ def plaid_public_token() -> Dict[str, Any]:
         raise PlaidTokenError(f"Failed to create sandbox public token: {str(e)}")
     except Exception as e:
         raise PlaidTokenError(f"Unexpected error creating sandbox public token: {str(e)}")
+    
+def exchange_public_token(public_token: str) -> str:
+    """
+    Exchanges a public_token for a long-term access_token.
+
+    This method takes a short-lived public token from Plaid Link and exchanges it
+    for a permanent access token that can be used to access the user's financial data.
+
+    Args:
+        public_token (str): The short-lived token returned from Plaid Link.
+
+    Returns:
+        str: A permanent access_token to access user data.
+
+    Raises:
+        PlaidTokenError: If there is an error exchanging the public token.
+
+    Example:
+        >>> access_token = exchange_public_token("public-sandbox-1234567890")
+        >>> print(f"Generated access token: {access_token}")
+        Generated access token: access-sandbox-1234567890
+    """
+    try:
+        request = ItemPublicTokenExchangeRequest(public_token=public_token)
+        response = client.item_public_token_exchange(request)
+        return response.to_dict()["access_token"]
+    except ApiException as e:
+        raise PlaidTokenError(f"Failed to exchange public token: {str(e)}")
