@@ -86,3 +86,16 @@ class AccountRepository:
             Optional[Account]: The account if found and belongs to user, None otherwise.
         """
         return Account.query.filter_by(id=account_id, user_id=user_id, is_active=True).first()
+    
+    def get_by_user_id_and_type(self, user_id: int, account_type: str) -> List[Account]:
+        """
+        Get accounts by user ID and account type.
+        
+        Args:
+            user_id (int): The user ID.
+            account_type (str): The account type (e.g., 'depository', 'credit', 'loan', 'investment').
+            
+        Returns:
+            List[Account]: List of accounts matching the criteria.
+        """
+        return Account.query.filter_by(user_id=user_id, type=account_type, is_active=True).all()
