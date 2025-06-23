@@ -68,3 +68,15 @@ class AccountsByType(Resource):
         user_id = get_jwt_identity()
         accounts = accounts_facade.get_accounts_by_type(user_id, account_type)
         return {"accounts": accounts}
+    
+@accounts_ns.route("/")
+class DeleteAccounts(Resource):
+    @accounts_ns.doc("delete_accounts")
+    @accounts_ns.response(200, "Accounts deleted successfully", error_model)
+    @accounts_ns.response(500, "Internal server error", error_model)
+    @handle_errors
+    @jwt_required()
+    def delete(self):
+        user_id = get_jwt_identity()
+        accounts_facade.delete_accounts(user_id)
+        return {"message": "Accounts deleted successfully"}
