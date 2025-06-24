@@ -31,3 +31,7 @@ class TransactionRepository:
     def get_by_id(self, transaction_id: int) -> Transaction:
         """Get transaction by ID"""
         return Transaction.query.get(transaction_id)
+    
+    def get_by_type(self, transaction_type: str) -> List[Transaction]:
+        """Get transactions by type"""
+        return Transaction.query.filter_by(type=transaction_type).all()
