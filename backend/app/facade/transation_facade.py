@@ -2,7 +2,7 @@ from app.services.plaid_config import sync_transactions
 from app.repositories.user_repository import UserRepository
 from app.repositories.transaction_repository import TransactionRepository
 from app.utils.plaid_exceptions import PlaidUserNotLinkedError, UserNotFoundError
-from app.utils.transaction_exceptions import TransactionNotFoundError
+from app.utils.transaction_exceptions import TransactionNotFoundError, TransactionTypeNotFoundError
 from typing import Dict, Any
 from datetime import datetime
 
@@ -126,5 +126,26 @@ class TransactionFacade:
         transaction = self.transaction_repository.get_by_id(transaction_id)
         if not transaction:
             raise TransactionNotFoundError()
+        
+        # Validate that the transaction belongs to the user
+        if transaction.user_id != int(user_id):
+            raise TransactionNotFoundError()
+            
         return transaction.to_dict()
     
+    def get_transactions_by_type(self, user_id: str, transaction_type: str) -> Dict[str, Any]:
+        """Get transactions by type for a specific user"""
+        user = self.user_repository.get_by_id(user_id)
+        if not user:
+            raise UserNotFoundError()
+        
+        transactions = self.transaction_repository.get_by_type_and_user(int(user_id), transaction_type)
+        
+        if not transactions:
+            raise TransactionTypeNotFoundError()
+        
+        return {
+            "transactions": [tx.to_dict() for tx in transactions],
+            "total_count": len(transactions),
+            "transaction_type": transaction_type
+        }
