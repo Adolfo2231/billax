@@ -1,7 +1,8 @@
-from app.services.plaid_config import sync_transactions, convert_dates
+from app.services.plaid_config import sync_transactions
 from app.repositories.user_repository import UserRepository
 from app.repositories.transaction_repository import TransactionRepository
-from app.utils.plaid_exceptions import PlaidDataSyncError, PlaidUserNotLinkedError, UserNotFoundError
+from app.utils.plaid_exceptions import PlaidUserNotLinkedError, UserNotFoundError
+from app.utils.transaction_exceptions import TransactionNotFoundError
 from typing import Dict, Any
 from datetime import datetime
 
@@ -119,3 +120,11 @@ class TransactionFacade:
             "total_count": self.transaction_repository.count_by_user_id(int(user_id)),
             "returned_count": len(transactions)
         }
+    
+    def get_transaction_by_id(self, user_id: str, transaction_id: int) -> Dict[str, Any]:
+        """Get transaction by ID"""
+        transaction = self.transaction_repository.get_by_id(transaction_id)
+        if not transaction:
+            raise TransactionNotFoundError()
+        return transaction.to_dict()
+    
