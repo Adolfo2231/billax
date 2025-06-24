@@ -6,6 +6,8 @@ import datetime
 
 transaction_ns = Namespace("transaction", description="Transaction API endpoints")
 
+transaction_facade = TransactionFacade()
+
 transaction_model = transaction_ns.model("Transaction", {
     "id": fields.Integer(required=True, description="Transaction ID"),
     "amount": fields.Float(required=True, description="Transaction amount"),
@@ -32,7 +34,6 @@ class Transactions(Resource):
         args = parser.parse_args()
         
         user_id = get_jwt_identity()
-        transaction_facade = TransactionFacade()
         result = transaction_facade.get_user_transactions(user_id, args.get('limit'), args.get('offset'))
         return result
 
@@ -52,7 +53,6 @@ class SyncTransactions(Resource):
         args = parser.parse_args()
         
         user_id = get_jwt_identity()
-        transaction_facade = TransactionFacade()
         result = transaction_facade.sync_transactions(user_id, args.get('start_date'), args.get('end_date'), args.get('count'))
         return result
     
@@ -66,6 +66,19 @@ class Transaction(Resource):
     @jwt_required()
     def get(self, transaction_id):
         user_id = get_jwt_identity()
-        transaction_facade = TransactionFacade()
         result = transaction_facade.get_transaction_by_id(user_id, transaction_id)
         return result
+
+@transaction_ns.route("/<string:transaction_type>")
+class TransactionsByType(Resource):
+    @transaction_ns.doc("get_transactions_by_type")
+    @transaction_ns.response(200, "Transactions retrieved successfully", transaction_model)
+    @transaction_ns.response(404, "Transactions not found", error_model)
+    @transaction_ns.response(500, "Internal server error", error_model)
+    @handle_errors
+    @jwt_required()
+    def get(self, transaction_type):
+        user_id = get_jwt_identity()
+        result = transaction_facade.get_transactions_by_type(user_id, transaction_type)
+        return result
+
