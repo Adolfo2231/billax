@@ -27,3 +27,7 @@ class TransactionRepository:
     def exists_by_plaid_id(self, plaid_transaction_id: str) -> bool:
         """Check if transaction exists by Plaid ID"""
         return Transaction.query.filter_by(plaid_transaction_id=plaid_transaction_id).first() is not None 
+    
+    def get_by_id(self, transaction_id: int) -> Transaction:
+        """Get transaction by ID"""
+        return Transaction.query.get(transaction_id)
