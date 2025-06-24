@@ -55,3 +55,17 @@ class SyncTransactions(Resource):
         transaction_facade = TransactionFacade()
         result = transaction_facade.sync_transactions(user_id, args.get('start_date'), args.get('end_date'), args.get('count'))
         return result
+    
+@transaction_ns.route("/<int:transaction_id>")
+class Transaction(Resource):
+    @transaction_ns.doc("get_transaction")
+    @transaction_ns.response(200, "Transaction retrieved successfully", transaction_model)
+    @transaction_ns.response(404, "Transaction not found", error_model)
+    @transaction_ns.response(500, "Internal server error", error_model)
+    @handle_errors
+    @jwt_required()
+    def get(self, transaction_id):
+        user_id = get_jwt_identity()
+        transaction_facade = TransactionFacade()
+        result = transaction_facade.get_transaction_by_id(user_id, transaction_id)
+        return result
