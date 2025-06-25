@@ -149,3 +149,21 @@ class TransactionFacade:
             "total_count": len(transactions),
             "transaction_type": transaction_type
         }
+    
+    def delete_transaction(self, user_id: str, transaction_id: int) -> Dict[str, Any]:
+        """Delete a transaction by ID"""
+        transaction = self.transaction_repository.get_by_id(transaction_id)
+        if not transaction:
+            raise TransactionNotFoundError()
+        
+        # Validate that the transaction belongs to the user
+        if transaction.user_id != int(user_id):
+            raise TransactionNotFoundError()
+        
+        self.transaction_repository.delete(transaction_id)
+        return {"message": "Transaction deleted successfully"}
+    
+    def delete_all_transactions(self, user_id: str) -> Dict[str, Any]:
+        """Delete all transactions for a user"""
+        self.transaction_repository.delete_all_by_user_id(int(user_id))
+        return {"message": "All transactions deleted successfully"}

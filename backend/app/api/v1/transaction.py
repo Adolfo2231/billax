@@ -82,3 +82,27 @@ class TransactionsByType(Resource):
         result = transaction_facade.get_transactions_by_type(user_id, transaction_type)
         return result
 
+@transaction_ns.route("/<int:transaction_id>/delete")
+class DeleteTransaction(Resource):
+    @transaction_ns.doc("delete_transaction")
+    @transaction_ns.response(200, "Transaction deleted successfully")
+    @transaction_ns.response(404, "Transaction not found", error_model)
+    @transaction_ns.response(500, "Internal server error", error_model)
+    @handle_errors
+    @jwt_required()
+    def delete(self, transaction_id):
+        user_id = get_jwt_identity()
+        result = transaction_facade.delete_transaction(user_id, transaction_id)
+        return result
+    
+@transaction_ns.route("/delete-all")
+class DeleteAllTransactions(Resource):
+    @transaction_ns.doc("delete_all_transactions")
+    @transaction_ns.response(200, "All transactions deleted successfully")
+    @transaction_ns.response(500, "Internal server error", error_model)
+    @handle_errors
+    @jwt_required()
+    def delete(self):
+        user_id = get_jwt_identity()
+        result = transaction_facade.delete_all_transactions(user_id)
+        return result
