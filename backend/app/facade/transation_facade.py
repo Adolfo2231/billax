@@ -167,3 +167,12 @@ class TransactionFacade:
         """Delete all transactions for a user"""
         self.transaction_repository.delete_all_by_user_id(int(user_id))
         return {"message": "All transactions deleted successfully"}
+    
+    def get_transaction_summary(self, user_id: str) -> Dict[str, Any]:
+        """Get transaction summary for a user"""
+        user = self.user_repository.get_by_id(user_id)
+        if not user:
+            raise UserNotFoundError()
+        
+        summary = self.transaction_repository.get_summary_by_user_id(int(user_id))
+        return summary
