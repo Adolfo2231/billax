@@ -82,6 +82,18 @@ class TransactionsByType(Resource):
         result = transaction_facade.get_transactions_by_type(user_id, transaction_type)
         return result
 
+@transaction_ns.route("/summary")
+class TransactionSummary(Resource):
+    @transaction_ns.doc("get_transaction_summary")
+    @transaction_ns.response(200, "Transaction summary retrieved successfully")
+    @transaction_ns.response(500, "Internal server error", error_model)
+    @handle_errors
+    @jwt_required()
+    def get(self):
+        user_id = get_jwt_identity()
+        result = transaction_facade.get_transaction_summary(user_id)
+        return result
+
 @transaction_ns.route("/<int:transaction_id>/delete")
 class DeleteTransaction(Resource):
     @transaction_ns.doc("delete_transaction")
