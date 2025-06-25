@@ -32,6 +32,21 @@ class TransactionRepository:
         """Get transaction by ID"""
         return Transaction.query.get(transaction_id)
     
-    def get_by_type(self, transaction_type: str) -> List[Transaction]:
-        """Get transactions by type"""
-        return Transaction.query.filter_by(type=transaction_type).all()
+    def get_by_type_and_user(self, user_id: int, transaction_type: str) -> List[Transaction]:
+        """Get transactions by type and user ID"""
+        return Transaction.query.filter_by(
+            user_id=user_id, 
+            category_primary=transaction_type
+        ).order_by(Transaction.date.desc()).all()
+    
+    def delete(self, transaction_id: int) -> None:
+        """Delete a transaction by ID"""
+        transaction = Transaction.query.get(transaction_id)
+        if transaction:
+            db.session.delete(transaction)
+            db.session.commit()
+    
+    def delete_all_by_user_id(self, user_id: int) -> None:
+        """Delete all transactions for a user"""
+        Transaction.query.filter_by(user_id=user_id).delete()
+        db.session.commit()
