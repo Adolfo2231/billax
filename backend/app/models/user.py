@@ -1,24 +1,25 @@
 """
 models/user.py
 
-This module defines the User model for the Billax finance application.
+This module defines the User model for the Billax financial application.
 It includes basic field validation and secure password handling.
 
 The User model represents a registered user in the system and handles:
 - User registration and authentication
 - Secure password storage
-- Basic data validation for name, email, and password
+- Basic field validation using SQLAlchemy validators
 """
 
 import re
 from datetime import datetime
 from app.extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.orm import validates
 
 
 class User(db.Model):
     """
-    Represents a registered user in the Billax finance application.
+    Represents a registered user in the Billax financial application.
 
     Attributes:
         id (int): Unique integer primary key.
@@ -43,33 +44,55 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def __init__(self, email: str, password: str, first_name: str, last_name: str, role: str = 'user'):
-        """
-        Initialize a new User instance.
+    @validates('email')
+    def validate_email(self, key, email):
+        """Validate email format."""
+        if not email:
+            raise ValueError("Email is required")
+        
+        if not isinstance(email, str):
+            raise ValueError("Email must be a string")
+        
+        # Basic email regex pattern
+        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(pattern, email):
+            raise ValueError("Invalid email format")
+        
+        return email
 
-        Args:
-            email (str): User's email address.
-            password (str): Plain text password (will be hashed).
-            first_name (str): User's first name.
-            last_name (str): User's last name.
-            role (str): User's role. Defaults to 'user'.
-        """
-        # Validate email
-        self.validate_email(email)
-        self.email = email
+    @validates('first_name')
+    def validate_first_name(self, key, first_name):
+        """Validate first name format."""
+        if not first_name:
+            raise ValueError("First name is required")
         
-        # Validate and hash password
-        self.set_password(password)
+        if not isinstance(first_name, str):
+            raise ValueError("First name must be a string")
         
-        # Validate names
-        self.validate_name(first_name, "First name")
-        self.first_name = first_name
+        if len(first_name.strip()) < 2:
+            raise ValueError("First name must be at least 2 characters long")
         
-        self.validate_name(last_name, "Last name")
-        self.last_name = last_name
+        if len(first_name.strip()) > 50:
+            raise ValueError("First name must be less than 50 characters")
         
-        # Set role (no validation needed as it has a default)
-        self.role = role
+        return first_name.strip()
+
+    @validates('last_name')
+    def validate_last_name(self, key, last_name):
+        """Validate last name format."""
+        if not last_name:
+            raise ValueError("Last name is required")
+        
+        if not isinstance(last_name, str):
+            raise ValueError("Last name must be a string")
+        
+        if len(last_name.strip()) < 2:
+            raise ValueError("Last name must be at least 2 characters long")
+        
+        if len(last_name.strip()) > 50:
+            raise ValueError("Last name must be less than 50 characters")
+        
+        return last_name.strip()
 
     def __repr__(self):
         """Returns a string representation of the user."""
@@ -80,51 +103,23 @@ class User(db.Model):
         """Get user's full name."""
         return f"{self.first_name} {self.last_name}"
 
-    def set_password(self, password: str):
-        """Hash and set the password."""
+    @property
+    def password(self):
+        raise AttributeError("Password is write-only.")
+
+    @password.setter
+    def password(self, password: str):
         if not isinstance(password, str):
             raise ValueError("Password must be a string")
-        
         if not password:
             raise ValueError("Password is required")
-        
         if len(password) < 8:
             raise ValueError("Password must be at least 8 characters long")
-        
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password: str) -> bool:
         """Check if the provided password matches the stored hash."""
         return check_password_hash(self.password_hash, password)
-
-    @staticmethod
-    def validate_email(email):
-        """Validate email format."""
-        if not isinstance(email, str):
-            raise ValueError("Email must be a string")
-        
-        if not email:
-            raise ValueError("Email is required")
-        
-        # Basic email regex pattern
-        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-        if not re.match(pattern, email):
-            raise ValueError("Invalid email format")
-
-    @staticmethod
-    def validate_name(name, field_name="Name"):
-        """Validate first name or last name."""
-        if not isinstance(name, str):
-            raise ValueError(f"{field_name} must be a string")
-        
-        if not name:
-            raise ValueError(f"{field_name} is required")
-        
-        if len(name.strip()) < 2:
-            raise ValueError(f"{field_name} must be at least 2 characters long")
-        
-        if len(name.strip()) > 50:
-            raise ValueError(f"{field_name} must be less than 50 characters")
 
     def to_dict(self):
         """Convert user to dictionary (excluding sensitive data)."""
@@ -141,4 +136,9 @@ class User(db.Model):
 
     def is_admin(self):
         """Check if user has admin role."""
-        return self.role == 'admin' 
+        return self.role == 'admin'
+
+    def __init__(self, *args, password=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if password is not None:
+            self.password = password  # Esto usa el property y hace hash/validación 
