@@ -54,12 +54,8 @@ class AuthFacade:
         if self.user_repository.exists_by_email(email):
             raise ValueError("Email already exists")
         
-        # Create user instance (validation and hashing happen in User constructor)
         user = User(**data)
-        
-        # Save user to database
         user = self.user_repository.save(user)
-        
         return user.to_dict()
         
     def login_user(self, data: dict) -> Dict[str, Any]:
