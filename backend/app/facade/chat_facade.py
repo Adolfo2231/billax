@@ -122,3 +122,10 @@ class ChatFacade:
         return {
             "response": ai_response["response"]
         }
+    
+    def delete_chat_id(self, user_id: int, chat_id: int):
+        self.chat_repository.delete_by_id(chat_id)
+    
+    def delete_all_chats(self, user_id: int):
+        self.chat_repository.delete_all_by_user_id(user_id)
+
