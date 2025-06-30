@@ -55,3 +55,28 @@ class ChatHistory(Resource):
         user_id = get_jwt_identity()
         history = chat_facade.get_chat_history(user_id)
         return {"history": history}
+    
+@chat_ns.route("/delete/<int:chat_id>")
+class DeleteChat(Resource):
+    @chat_ns.doc("delete_chat")
+    @chat_ns.response(200, "Chat deleted successfully")
+    @chat_ns.response(500, "Internal server error", error_model)
+    @handle_errors
+    @jwt_required()
+    def delete(self, chat_id):
+        user_id = get_jwt_identity()
+        chat_facade.delete_chat_id(user_id, chat_id)
+        return {"message": "Chat deleted successfully"}, 200
+
+@chat_ns.route("/delete/all")
+class DeleteAllChats(Resource):
+    @chat_ns.doc("delete_all_chats")
+    @chat_ns.response(200, "All chats deleted successfully")
+    @chat_ns.response(500, "Internal server error", error_model)
+    @handle_errors
+    @jwt_required()
+    def delete(self):
+        user_id = get_jwt_identity()
+        chat_facade.delete_all_chats(user_id)
+        return {"message": "All chats deleted successfully"}, 200
+
