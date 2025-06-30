@@ -27,3 +27,10 @@ class ChatRepository:
             .limit(limit)\
             .all()
     
+    def delete_by_id(self, chat_id: int):
+        self.chat_model.query.filter_by(id=chat_id).delete()
+        db.session.commit()
+    
+    def delete_all_by_user_id(self, user_id: int):
+        self.chat_model.query.filter_by(user_id=user_id).delete()
+        db.session.commit()
