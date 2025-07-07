@@ -73,3 +73,17 @@ class Disconnect(Resource):
     def post(self):
         user_id = get_jwt_identity()
         return plaid_facade.disconnect(user_id)
+
+@plaid_ns.route("/status")
+class PlaidStatus(Resource):
+    @plaid_ns.doc("plaid_status")
+    @plaid_ns.response(200, "Plaid status", model=plaid_ns.model('PlaidStatus', {'linked': fields.Boolean}))
+    @plaid_ns.response(401, "Unauthorized", error_model)
+    @plaid_ns.response(500, "Internal server error", error_model)
+    @handle_errors
+    @jwt_required()
+    def get(self):
+        user_id = get_jwt_identity()
+        # Suponiendo que plaid_facade tiene un método has_access_token(user_id)
+        linked = plaid_facade.has_access_token(user_id)
+        return {"linked": linked}
