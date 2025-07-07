@@ -1,6 +1,6 @@
 from flask import Flask
 from .config import DevelopmentConfig
-from app.extensions import db, migrate, jwt, mail
+from app.extensions import db, migrate, jwt, mail, cors
 
 
 def create_app(config_class=DevelopmentConfig):
@@ -16,7 +16,14 @@ def create_app(config_class=DevelopmentConfig):
     migrate.init_app(app, db)
     jwt.init_app(app)
     mail.init_app(app)
-    
+    cors.init_app(app, resources={
+        r"/api/*": {"origins": [
+            "http://127.0.0.1:5001",
+            "http://10.104.241.248:5001", 
+            "http://localhost:65302",
+            "http://10.104.241.248:65302"
+        ]}
+    })
     
     # Register routes
     from .api.v1 import api_v1_bp as api_bp
