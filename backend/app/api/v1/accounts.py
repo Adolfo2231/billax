@@ -131,3 +131,16 @@ class AccountsSummary(Resource):
         user_id = get_jwt_identity()
         summary = accounts_facade.get_accounts_summary(user_id)
         return {"summary": summary}
+    
+@accounts_ns.route("/delete/<int:account_id>")
+class DeleteAccount(Resource):
+    @accounts_ns.doc("delete_account")
+    @accounts_ns.response(200, "Account deleted successfully", error_model)
+    @accounts_ns.response(404, "Account not found", error_model)
+    @accounts_ns.response(500, "Internal server error", error_model)
+    @handle_errors
+    @jwt_required()
+    def delete(self, account_id):
+        user_id = get_jwt_identity()
+        accounts_facade.delete_account(user_id, account_id)
+        return {"message": "Account deleted successfully"}
