@@ -9,6 +9,7 @@ chat_ns = Namespace("chat", description="Chat with the AI")
 
 chat_model = chat_ns.model("Chat", {
     "message": fields.String(required=True, description="The message to send to the AI"),
+    "selected_account_id": fields.String(required=False, description="The selected account ID for context filtering"),
 })
 
 chat_response_model = chat_ns.model("ChatResponse", {
@@ -41,7 +42,8 @@ class Chat(Resource):
     def post(self):
         user_id = get_jwt_identity()
         message = chat_ns.payload.get("message")
-        response = chat_facade.message(user_id, message)
+        selected_account_id = chat_ns.payload.get("selected_account_id")
+        response = chat_facade.message(user_id, message, selected_account_id)
         return response
 
 @chat_ns.route("/history")
