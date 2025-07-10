@@ -6,6 +6,8 @@ from app.repositories.user_repository import UserRepository
 from datetime import datetime, timedelta
 from app.config import Config
 from typing import Dict, Any, List
+import re
+import pprint
 
 
 class ChatFacade:
@@ -16,18 +18,16 @@ class ChatFacade:
         self.account_repository = AccountRepository()
         self.transaction_repository = TransactionRepository()
 
-    def get_financial_context(self, user_id: int) -> Dict[str, Any]:
+    def get_financial_context(self, user_id: int, selected_account_id: str = None) -> Dict[str, Any]:
         """
         Obtiene el contexto financiero del usuario.
-        
         Args:
             user_id (int): ID del usuario
-            
+            selected_account_id (str): ID de la cuenta seleccionada para filtrar transacciones
         Returns:
             Dict[str, Any]: Contexto financiero con cuentas y transacciones
         """
         try:
-            # Obtener el usuario
             user = self.user_repository.get_by_id(user_id)
             if not user:
                 return {
@@ -36,23 +36,42 @@ class ChatFacade:
                     "timestamp": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
                     "note": "Usuario no encontrado"
                 }
-            
-            # Obtener cuentas y transacciones de la base de datos local
+
             accounts = self.account_repository.get_by_user_id(user_id)
-            transactions = self.transaction_repository.get_by_user_id(user_id)
-            
-            # Usar to_dict() para serializar
             accounts_data = [account.to_dict() for account in accounts]
-            transactions_data = [transaction.to_dict() for transaction in transactions]
-            
+
+            if selected_account_id:
+                selected_account = next((acc for acc in accounts if str(acc.id) == str(selected_account_id)), None)
+                if selected_account:
+                    transactions = self.transaction_repository.get_by_account_id(selected_account.plaid_account_id)
+                    transactions_data = [tx.to_dict() for tx in transactions]
+                    accounts_data = [selected_account.to_dict()]
+                else:
+                    transactions_data = []
+            else:
+                transactions = self.transaction_repository.get_by_user_id(user_id)
+                transactions_data = [tx.to_dict() for tx in transactions]
+
+            for tx in transactions_data:
+                if isinstance(tx.get('name'), str):
+                    tx['name'] = re.sub(r'[*/: ]+$', '', tx['name'])
+
+            transactions_data.sort(key=lambda t: t.get('date', ''), reverse=True)
+
+            print("==== [DEBUG] get_financial_context ====")
+            print(f"selected_account_id: {selected_account_id}")
+            print(f"accounts_data: {accounts_data}")
+            print(f"transactions_data: {transactions_data}")
+            print("==== [DEBUG] END get_financial_context ====")
+
             return {
                 "accounts": accounts_data,
                 "transactions": transactions_data,
-                "timestamp": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+                "timestamp": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+                "selected_account_id": selected_account_id
             }
-            
+
         except Exception as e:
-            # En caso de error, retornar contexto sin datos financieros
             return {
                 "accounts": [],
                 "transactions": [],
@@ -94,31 +113,40 @@ class ChatFacade:
         except Exception as e:
             return []
 
-    def message(self, user_id: int, message: str) -> Dict[str, Any]:
-        """
-        Send a message to the AI and save the conversation to the database.
+    def message(self, user_id: int, message: str, selected_account_id: str = None) -> Dict[str, Any]:
+        print(f"==== INICIO message() ====")
+        print(f"User ID: {user_id}")
+        print(f"Message: {message}")
+        print(f"Selected Account ID: {selected_account_id}")
 
-        Args:
-            user_id (int): The ID of the user sending the message.
-            message (str): The message to send to the AI.
-            
-        Returns:
-            Dict[str, Any]: The AI response only
-        """
-        
-        # Get the user's financial context
-        financial_context = self.get_financial_context(user_id)
-        
-        # Get chat history for AI
+        print("Obteniendo contexto financiero...")
+        financial_context = self.get_financial_context(user_id, selected_account_id)
+        print(f"[DEBUG] Contexto financiero enviado a la IA: {financial_context}")
+        print(f"Contexto obtenido con {len(financial_context.get('accounts', []))} cuentas y {len(financial_context.get('transactions', []))} transacciones")
+
+        # Si solo hay una cuenta, modifica la pregunta para que sea explícita
+        accounts = financial_context.get('accounts', [])
+        if len(accounts) == 1:
+            account_name = accounts[0].get('name', 'esta cuenta')
+            user_message = f"Para la cuenta {account_name}, {message}"
+            print(f"[DEBUG] Pregunta modificada para IA: {user_message}")
+        else:
+            user_message = message
+
+        print("Obteniendo historial de chat...")
         chat_history = self.get_chat_history(user_id, format_type="ai")
-        
-        # Get the AI response
-        ai_response = self.ai_service.get_chat_response(message, financial_context, chat_history)
+        print(f"Historial obtenido: {len(chat_history)} mensajes")
 
-        # Save the message and response to the database
+        print("Enviando a AIService...")
+        ai_response = self.ai_service.get_chat_response(user_message, financial_context, chat_history)
+        print(f"Respuesta de AI recibida: {len(ai_response.get('response', ''))} caracteres")
+
+        print("Guardando en base de datos...")
         self.chat_repository.save(user_id, message, ai_response["response"])
-        
-        # Return only the AI response, not the full context
+        print("Mensaje guardado exitosamente")
+
+        print("==== FIN message() ====")
+
         return {
             "response": ai_response["response"]
         }
