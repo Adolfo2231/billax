@@ -23,6 +23,9 @@ class BaseRepository(Generic[T]):
     """
 
     model: Type[T] = None  # Debe ser sobrescrito por cada subclase
+    
+    def __init__(self):
+        pass
 
     @classmethod
     def get_by_id(cls, id_: Union[int, str]) -> Optional[T]:

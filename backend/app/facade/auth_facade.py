@@ -43,7 +43,7 @@ class AuthFacade:
             data (dict): User data including email, password, first_name, last_name, role.
             
         Returns:
-            Dict[str, Any]: User data without sensitive information.
+            Dict[str, Any]: User data without sensitive information and JWT token.
             
         Raises:
             ValueError: If email already exists or validation fails.
@@ -56,7 +56,15 @@ class AuthFacade:
         
         user = User(**data)
         user = self.user_repository.save(user)
-        return user.to_dict()
+        
+        # Generate token for the new user
+        token = create_token(str(user.id))
+        
+        return {
+            "message": "User registered successfully",
+            "token": token,
+            "user": user.to_dict()
+        }
         
     def login_user(self, data: dict) -> Dict[str, Any]:
         """

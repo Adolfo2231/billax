@@ -13,7 +13,8 @@ class PlaidFacade:
             raise PlaidUserNotFoundError()
         if user.plaid_access_token:
             raise PlaidUserAlreadyLinkedError()
-        return create_link_plaid(user_id)
+        result = create_link_plaid(user_id)
+        return {"link_token": result["link_token"]}
 
     def create_sandbox_public_token(self, user_id):
         """(Sandbox only) Create a public token for testing."""
@@ -35,10 +36,18 @@ class PlaidFacade:
         return {"access_token": access_token}
     
     def disconnect(self, user_id: int) -> None:
-        """Disconnect Plaid from the user."""
+        """Disconnect Plaid from the user and delete all accounts."""
         user = self.user_repository.get_by_id(user_id)
         if not user:
             raise PlaidUserNotFoundError()
         user.plaid_access_token = None
         self.user_repository.save(user)
-        return {"message": "Plaid disconnected"}
+        # Delete all accounts for this user
+        from app.repositories.account_repository import AccountRepository
+        AccountRepository().delete_by_user_id(user_id)
+        return {"message": "Plaid disconnected and accounts deleted"}
+
+    def has_access_token(self, user_id: int) -> bool:
+        """Return True if the user has a Plaid access token, False otherwise."""
+        user = self.user_repository.get_by_id(user_id)
+        return bool(user and user.plaid_access_token)

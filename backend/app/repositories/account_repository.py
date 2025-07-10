@@ -51,9 +51,10 @@ class AccountRepository:
             List[Account]: List of saved/updated accounts.
         """
         for account in accounts:
-            # Check if account already exists by plaid_account_id
+            # Check if account already exists by plaid_account_id AND user_id
             existing_account = Account.query.filter_by(
-                plaid_account_id=account.plaid_account_id
+                plaid_account_id=account.plaid_account_id,
+                user_id=account.user_id
             ).first()
             
             if existing_account:
@@ -114,6 +115,28 @@ class AccountRepository:
             Account.query.filter_by(user_id=user_id).delete()
             db.session.commit()
             return True
+        except Exception:
+            db.session.rollback()
+            return False
+        
+    def delete_by_id_and_user_id(self, account_id: int, user_id: int) -> bool:
+        """
+        Delete an account by its ID and user ID.
+        
+        Args:
+            account_id (int): The account ID.
+            user_id (int): The user ID.
+            
+        Returns:
+            bool: True if deleted successfully, False otherwise.
+        """
+        try:
+            account = Account.query.filter_by(id=account_id, user_id=user_id).first()
+            if account:
+                account.is_active = False
+                db.session.commit()
+                return True
+            return False
         except Exception:
             db.session.rollback()
             return False

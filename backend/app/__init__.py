@@ -17,12 +17,7 @@ def create_app(config_class=DevelopmentConfig):
     jwt.init_app(app)
     mail.init_app(app)
     cors.init_app(app, resources={
-        r"/api/*": {"origins": [
-            "http://127.0.0.1:5001",
-            "http://10.104.241.248:5001", 
-            "http://localhost:65302",
-            "http://10.104.241.248:65302"
-        ]}
+        r"/api/*": {"origins": "*"}
     })
     
     # Register routes

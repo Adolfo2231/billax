@@ -12,13 +12,16 @@ class TransactionRepository:
         db.session.commit()
         return transaction
     
-    def get_by_user_id(self, user_id: int, limit: int = None, offset: int = 0) -> List[Transaction]:
-        """Get transactions by user ID"""
-        query = Transaction.query.filter_by(user_id=user_id).order_by(Transaction.date.desc())
-        
+    def get_by_user_id(self, user_id: int, limit: int = None, offset: int = 0, start_date: str = None, end_date: str = None) -> List[Transaction]:
+        """Get transactions by user ID, optionally filtered by date range"""
+        query = Transaction.query.filter_by(user_id=user_id)
+        if start_date:
+            query = query.filter(Transaction.date >= start_date)
+        if end_date:
+            query = query.filter(Transaction.date <= end_date)
+        query = query.order_by(Transaction.date.desc())
         if limit:
             query = query.limit(limit).offset(offset)
-        
         return query.all()
     
     def count_by_user_id(self, user_id: int) -> int:
@@ -43,6 +46,10 @@ class TransactionRepository:
             user_id=user_id, 
             category_primary=transaction_type
         ).order_by(Transaction.date.desc()).all()
+    
+    def get_by_account_id(self, account_id: str) -> List[Transaction]:
+        """Get transactions by account ID (plaid_account_id)"""
+        return Transaction.query.filter_by(account_id=account_id).order_by(Transaction.date.desc()).all()
     
     def get_summary_by_user_id(self, user_id: int) -> Dict[str, Any]:
         """Get comprehensive transaction summary for a user"""

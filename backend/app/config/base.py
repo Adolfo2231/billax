@@ -21,6 +21,7 @@ class Config:
     # Database Configuration
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    FRONTEND_URL = os.environ.get('FRONTEND_URL')
     
     @staticmethod
     def init_app(app):

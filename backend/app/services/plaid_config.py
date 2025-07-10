@@ -91,8 +91,6 @@ def create_link_plaid(user_id: str) -> Dict[str, Any]:
 
         return {
             "link_token": response_dict["link_token"],
-            "expiration": (datetime.datetime.utcnow() + timedelta(hours=24)).isoformat(),
-            "request_id": request.to_dict()
         }
 
     except ApiException as e:

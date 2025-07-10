@@ -64,9 +64,11 @@ class Account(db.Model):
             'type': self.type,
             'subtype': self.subtype,
             'mask': self.mask,
-            'current_balance': float(self.current_balance) if self.current_balance else None,
-            'available_balance': float(self.available_balance) if self.available_balance else None,
-            'limit': float(self.limit) if self.limit else None,
+            'balances': {
+                'current': float(self.current_balance) if self.current_balance is not None else 0.0,
+                'available': float(self.available_balance) if self.available_balance is not None else 0.0,
+                'limit': float(self.limit) if self.limit is not None else None
+            },
             'currency_code': self.currency_code,
             'is_active': self.is_active,
             'created_at': self.created_at.isoformat() if self.created_at else None,

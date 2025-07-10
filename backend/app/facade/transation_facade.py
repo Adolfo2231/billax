@@ -64,26 +64,42 @@ class TransactionFacade:
     def _save_transactions_to_db(self, transactions: list, user_id: int) -> int:
         """Save transactions to database, avoiding duplicates"""
         saved_count = 0
-        
+
+        # Listas estándar de categorías
+        gasto_categorias = [
+            'FOOD_AND_DRINK', 'TRANSPORTATION', 'GENERAL_MERCHANDISE', 'TRAVEL',
+            'ENTERTAINMENT', 'HEALTHCARE', 'RENT', 'UTILITIES', 'SHOPPING',
+            'GROCERY', 'RESTAURANT', 'GAS', 'SUPERMARKET', 'FAST_FOOD', 'COFFEE'
+        ]
+        ingreso_categorias = ['INCOME', 'DEPOSIT', 'TRANSFER', 'PAYROLL']
+
         for tx in transactions:
             # Check if transaction already exists
             if self.transaction_repository.exists_by_plaid_id(tx['transaction_id']):
                 continue
-            
-            # Prepare transaction data for database
+
+            # Preparar transaction_data
+            category_primary = tx.get('personal_finance_category', {}).get('primary')
+            amount = tx['amount']
+            # Normalizar el signo
+            if category_primary in gasto_categorias and amount > 0:
+                amount = -abs(amount)
+            elif category_primary in ingreso_categorias and amount < 0:
+                amount = abs(amount)
+
             transaction_data = {
                 'plaid_transaction_id': tx['transaction_id'],
                 'account_id': tx['account_id'],
                 'user_id': user_id,
                 'name': tx['name'],
-                'amount': tx['amount'],
+                'amount': amount,
                 'date': datetime.strptime(tx['date'], '%Y-%m-%d').date(),
                 'authorized_date': datetime.strptime(tx['authorized_date'], '%Y-%m-%d').date() if tx.get('authorized_date') else None,
                 'merchant_name': tx.get('merchant_name'),
                 'merchant_entity_id': tx.get('merchant_entity_id'),
                 'logo_url': tx.get('logo_url'),
                 'website': tx.get('website'),
-                'category_primary': tx.get('personal_finance_category', {}).get('primary'),
+                'category_primary': category_primary,
                 'category_detailed': tx.get('personal_finance_category', {}).get('detailed'),
                 'category_confidence': tx.get('personal_finance_category', {}).get('confidence_level'),
                 'payment_channel': tx.get('payment_channel'),
@@ -100,21 +116,19 @@ class TransactionFacade:
                 'transaction_code': tx.get('transaction_code'),
                 'check_number': tx.get('check_number')
             }
-            
+
             # Save transaction
             self.transaction_repository.create(transaction_data)
             saved_count += 1
-        
+
         return saved_count
     
-    def get_user_transactions(self, user_id: str, limit: int = None, offset: int = 0) -> Dict[str, Any]:
-        """Get transactions from database for a user"""
+    def get_user_transactions(self, user_id: str, limit: int = None, offset: int = 0, start_date: str = None, end_date: str = None) -> Dict[str, Any]:
+        """Get transactions from database for a user, optionally filtered by date range"""
         user = self.user_repository.get_by_id(user_id)
         if not user:
             raise UserNotFoundError()
-        
-        transactions = self.transaction_repository.get_by_user_id(int(user_id), limit, offset)
-        
+        transactions = self.transaction_repository.get_by_user_id(int(user_id), limit, offset, start_date, end_date)
         return {
             "transactions": [tx.to_dict() for tx in transactions],
             "total_count": self.transaction_repository.count_by_user_id(int(user_id)),
@@ -175,4 +189,18 @@ class TransactionFacade:
             raise UserNotFoundError()
         
         summary = self.transaction_repository.get_summary_by_user_id(int(user_id))
-        return summary
+        
+        # Format summary for frontend
+        return {
+            "summary": {
+                "total_count": summary.get("total_transactions", 0),
+                "total_income": summary.get("total_income", 0),
+                "total_expenses": summary.get("total_spent", 0),
+                "net_balance": summary.get("net_flow", 0),
+                "categories": summary.get("categories", {}),
+                "monthly_trends": summary.get("monthly_trends", {}),
+                "top_merchants": summary.get("top_merchants", []),
+                "payment_analysis": summary.get("payment_analysis", {}),
+                "transaction_stats": summary.get("transaction_stats", {})
+            }
+        }

@@ -6,7 +6,9 @@ class ChatRepository:
         self.chat_model = Chat
 
     def save(self, user_id: int, message: str, response: str):
+        print(f"[DEBUG] ChatRepository.save called with user_id={user_id}, message={message}, response={response}")
         chat = self.chat_model(user_id=user_id, message=message, response=response)
+        print(f"[DEBUG] Chat instance created: {chat}")
         db.session.add(chat)
         db.session.commit()
         return chat
