@@ -123,12 +123,17 @@ class TransactionFacade:
 
         return saved_count
     
-    def get_user_transactions(self, user_id: str, limit: int = None, offset: int = 0, start_date: str = None, end_date: str = None) -> Dict[str, Any]:
-        """Get transactions from database for a user, optionally filtered by date range"""
+    def get_user_transactions(self, user_id: str, limit: int = None, offset: int = 0, start_date: str = None, end_date: str = None, account_id: str = None) -> Dict[str, Any]:
+        """Get transactions from database for a user, optionally filtered by date range and account_id"""
         user = self.user_repository.get_by_id(user_id)
         if not user:
             raise UserNotFoundError()
-        transactions = self.transaction_repository.get_by_user_id(int(user_id), limit, offset, start_date, end_date)
+        # Si se proporciona account_id, filtrar por ese account_id
+        if account_id:
+            transactions = self.transaction_repository.get_by_user_id(int(user_id), limit, offset, start_date, end_date)
+            transactions = [tx for tx in transactions if tx.account_id == account_id]
+        else:
+            transactions = self.transaction_repository.get_by_user_id(int(user_id), limit, offset, start_date, end_date)
         return {
             "transactions": [tx.to_dict() for tx in transactions],
             "total_count": self.transaction_repository.count_by_user_id(int(user_id)),
