@@ -1,0 +1,407 @@
+.accounts-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.accounts-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  padding: 2.5rem 2rem;
+  max-width: 800px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.accounts-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.accounts-logo {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #4caf50;
+  margin-bottom: 0.5rem;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.accounts-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #222;
+}
+
+.accounts-subtitle {
+  color: #888;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Plaid Connect Section */
+.plaid-connect-section {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.plaid-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.plaid-connect-section h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 0.5rem;
+}
+
+.plaid-connect-section p {
+  color: #666;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.plaid-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.step-number {
+  background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+  color: #fff;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.step-text {
+  color: #555;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.plaid-note {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #e8f5e8;
+  border-radius: 8px;
+  border: 1px solid #c8e6c9;
+}
+
+.plaid-note p {
+  color: #2e7d32;
+  font-size: 0.85rem;
+  margin: 0;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.plaid-connect-btn {
+  background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 8px;
+  padding: 1rem 2rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(56, 239, 125, 0.08);
+}
+
+.plaid-connect-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(56, 239, 125, 0.15);
+}
+
+.plaid-connect-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Accounts Content */
+.accounts-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.accounts-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.sync-btn {
+  background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sync-btn:hover {
+  transform: translateY(-1px);
+}
+
+.sync-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.disconnect-btn {
+  background: linear-gradient(90deg, #ff6b6b 0%, #ee5a52 100%);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.disconnect-btn:hover {
+  transform: translateY(-1px);
+}
+
+.disconnect-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Summary Section */
+.accounts-summary {
+  display: flex;
+  justify-content: center;
+}
+
+.summary-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  text-align: center;
+  min-width: 200px;
+}
+
+.summary-title {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin-bottom: 0.5rem;
+}
+
+.summary-amount {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.summary-subtitle {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Accounts List */
+.accounts-list h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.no-accounts {
+  text-align: center;
+  color: #666;
+  padding: 2rem;
+}
+
+.accounts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.account-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.2s;
+}
+
+.account-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.account-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.account-icon {
+  font-size: 2rem;
+}
+
+.account-info {
+  flex: 1;
+}
+
+.account-name {
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 0.2rem;
+}
+
+.account-type {
+  font-size: 0.9rem;
+  color: #666;
+  text-transform: capitalize;
+}
+
+.account-balance {
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.balance-amount {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 0.2rem;
+}
+
+.balance-label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.account-available {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #28a745;
+  font-weight: 500;
+}
+
+/* Messages */
+.accounts-error {
+  background: #fff0f0;
+  color: #d32f2f;
+  border: 1px solid #ffcdd2;
+  border-radius: 6px;
+  padding: 0.7rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.98rem;
+}
+
+.accounts-success {
+  background: #f0fff0;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+  border-radius: 6px;
+  padding: 0.7rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.98rem;
+}
+
+
+
+/* Loading */
+.loading-spinner {
+  text-align: center;
+  color: #666;
+  font-size: 1.1rem;
+  padding: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .accounts-container {
+    padding: 1rem 0.5rem;
+  }
+  
+  .accounts-card {
+    padding: 1.5rem 1rem;
+    max-width: 95vw;
+  }
+  
+  .accounts-actions {
+    flex-direction: column;
+  }
+  
+  .accounts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .account-card {
+    padding: 1rem;
+  }
+  
+  .plaid-steps {
+    padding: 0.8rem;
+  }
+  
+  .step-text {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .accounts-container {
+    padding: 0.5rem;
+  }
+  
+  .accounts-card {
+    padding: 1rem 0.5rem;
+  }
+  
+  .accounts-title {
+    font-size: 1.5rem;
+  }
+  
+  .summary-card {
+    padding: 1rem 1.5rem;
+  }
+  
+  .summary-amount {
+    font-size: 1.5rem;
+  }
+} 

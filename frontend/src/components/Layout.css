@@ -1,0 +1,15 @@
+.layout {
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.layout-main {
+  padding-top: 0;
+  min-height: calc(100vh - 70px);
+}
+
+@media (max-width: 480px) {
+  .layout-main {
+    min-height: calc(100vh - 60px);
+  }
+} 
