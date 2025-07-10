@@ -33,6 +33,7 @@ class Transactions(Resource):
         parser.add_argument('offset', type=int, required=False, default=0, help='Offset for pagination')
         parser.add_argument('start_date', type=str, required=False, help='Start date in YYYY-MM-DD format')
         parser.add_argument('end_date', type=str, required=False, help='End date in YYYY-MM-DD format')
+        parser.add_argument('account_id', type=str, required=False, help='Account ID to filter transactions')
         args = parser.parse_args()
         
         user_id = get_jwt_identity()
@@ -41,7 +42,8 @@ class Transactions(Resource):
             args.get('limit'),
             args.get('offset'),
             args.get('start_date'),
-            args.get('end_date')
+            args.get('end_date'),
+            args.get('account_id')
         )
         return result
 
