@@ -3,10 +3,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import './Login.css';
-import authService from '../services/authService';
+import { useAuth } from '../contexts/AuthContext';
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -22,7 +23,7 @@ function Login() {
     setError('');
     setLoading(true);
     try {
-      await authService.login({ email, password });
+      await login({ email, password });
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);

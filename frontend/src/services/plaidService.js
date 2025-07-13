@@ -59,7 +59,6 @@ class PlaidService {
       // 1. Crear link token
       const linkTokenResponse = await this.createLinkToken();
       const linkToken = linkTokenResponse.link_token;
-      console.log('Link token recibido:', linkToken);
 
       // 2. Abrir Plaid Link y obtener public token
       const publicToken = await this.openPlaidLink(linkToken);
@@ -98,11 +97,9 @@ class PlaidService {
     const handler = window.Plaid.create({
       token: linkToken,
       onSuccess: (public_token, metadata) => {
-        console.log('Plaid Link Success:', { public_token, metadata });
         resolve(public_token);
       },
       onExit: (err, metadata) => {
-        console.log('Plaid Link Exit:', { err, metadata });
         if (err) {
           reject(new Error(err.error_message || 'User exited Plaid Link'));
         } else {
@@ -110,7 +107,7 @@ class PlaidService {
         }
       },
       onEvent: (eventName, metadata) => {
-        console.log('Plaid Link Event:', eventName, metadata);
+        // console.log('Plaid Link Event:', eventName, metadata);
       }
     });
 

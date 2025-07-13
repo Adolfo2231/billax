@@ -202,7 +202,7 @@ function Dashboard() {
               {transactions.length > 0 ? (
                 <div className="transactions-list">
                   {transactions.slice(0, 5).map((transaction) => (
-                    <div key={transaction.id} className="transaction-item">
+                    <div key={transaction.id || transaction._id || transaction.date+transaction.amount} className="transaction-item">
                       <div className="transaction-icon">
                         {getAccountIcon(transaction.category?.[0])}
                       </div>
@@ -248,7 +248,7 @@ function Dashboard() {
               {accounts.length > 0 ? (
                 <div className="accounts-list">
                   {accounts.slice(0, 3).map((account) => (
-                    <div key={account.account_id} className="account-item">
+                    <div key={account.account_id || account.id || account.name} className="account-item">
                       <div className="account-info">
                         <h4>{account.name}</h4>
                         <p>{account.type} • {account.subtype}</p>

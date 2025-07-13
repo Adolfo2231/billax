@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import './Login.css';
+import authService from '../services/authService';
 
 function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -30,14 +31,8 @@ function ForgotPassword() {
     setMessage('');
     setLoading(true);
     try {
-      const res = await fetch(process.env.REACT_APP_API_BASE_URL + '/auth/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Error sending reset email');
-      setMessage(data.message || 'If the email exists, you will receive a reset link.');
+      await authService.forgotPassword(email);
+      setMessage('If the email exists, you will receive a reset link.');
     } catch (err) {
       setError(err.message);
     } finally {

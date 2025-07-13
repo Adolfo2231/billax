@@ -23,6 +23,7 @@ const Navbar = () => {
     { path: '/dashboard', label: 'Dashboard', icon: '📊' },
     { path: '/accounts', label: 'Accounts', icon: '🏦' },
     { path: '/transactions', label: 'Transactions', icon: '💳' },
+    { path: '/goals', label: 'Goals', icon: '🎯' },
     { path: '/chat', label: 'Chat', icon: '💬' },
     // Puedes agregar más enlaces aquí
     // { path: '/analytics', label: 'Analytics', icon: '📈' },

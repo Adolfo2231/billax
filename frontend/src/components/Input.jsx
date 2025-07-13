@@ -50,7 +50,7 @@ const Input = ({
         disabled={disabled}
         autoFocus={autoFocus}
         className="w-full px-3 py-2 border rounded-md"
-        style={{ paddingLeft: 36, paddingRight: isPassword ? 36 : 12 }}
+        style={{ paddingLeft: 36, paddingRight: isPassword ? 36 : 12, color: '#222', background: '#fff' }}
       />
       {isPassword && (
         <button

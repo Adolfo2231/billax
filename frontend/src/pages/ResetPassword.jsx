@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import './Login.css';
+import authService from '../services/authService';
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -37,13 +38,7 @@ function ResetPassword() {
     }
     setLoading(true);
     try {
-      const res = await fetch(process.env.REACT_APP_API_BASE_URL + '/auth/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, new_password: password })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Error resetting password');
+      await authService.resetPassword(token, password);
       setMessage('Password updated successfully! You can now sign in.');
       setTimeout(() => navigate('/login'), 2000);
     } catch (err) {

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import './Login.css';
+import authService from '../services/authService';
 
 function Register() {
   const navigate = useNavigate();
@@ -33,18 +34,12 @@ function Register() {
     }
     setLoading(true);
     try {
-      const res = await fetch(process.env.REACT_APP_API_BASE_URL + '/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          first_name: firstName,
-          last_name: lastName,
-          email,
-          password
-        })
+      await authService.register({
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        password
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Registration failed');
       setSuccess('Registration successful! Please sign in.');
       setTimeout(() => navigate('/login'), 2000);
     } catch (error) {
