@@ -1,4 +1,15 @@
-from .base_repository import BaseRepository
-from .user_repository import UserRepository
+"""
+Repository module exports.
 
-__all__ = ['BaseRepository', 'UserRepository'] 
+This module exports the main repository classes and interfaces
+for easy importing throughout the application.
+"""
+
+from .base_repository import IRepository, BaseRepository
+from .goal_repository import GoalRepository
+
+__all__ = [
+    'IRepository',
+    'BaseRepository', 
+    'GoalRepository'
+] 
