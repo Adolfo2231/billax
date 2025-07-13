@@ -44,6 +44,9 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    # Relationships
+    goals = db.relationship('Goal', back_populates='user', cascade='all, delete-orphan')
+
     @validates('email')
     def validate_email(self, key, email):
         """Validate email format."""
@@ -109,8 +112,6 @@ class User(db.Model):
 
     @password.setter
     def password(self, password: str):
-        if not isinstance(password, str):
-            raise ValueError("Password must be a string")
         if not password:
             raise ValueError("Password is required")
         if len(password) < 8:
