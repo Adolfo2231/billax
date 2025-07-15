@@ -32,7 +32,7 @@ class PlaidFacade:
             raise PlaidUserNotFoundError()
         access_token = exchange_public_token(public_token)
         user.plaid_access_token = access_token
-        self.user_repository.save(user)
+        self.user_repository.update(user)
         return {"access_token": access_token}
     
     def disconnect(self, user_id: int) -> None:
@@ -41,7 +41,7 @@ class PlaidFacade:
         if not user:
             raise PlaidUserNotFoundError()
         user.plaid_access_token = None
-        self.user_repository.save(user)
+        self.user_repository.update(user)
         # Delete all accounts for this user
         from app.repositories.account_repository import AccountRepository
         AccountRepository().delete_by_user_id(user_id)
