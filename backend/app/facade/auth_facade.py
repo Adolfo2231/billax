@@ -38,28 +38,14 @@ class AuthFacade:
     def register_user(self, data: dict) -> Dict[str, Any]:
         """
         Register a new user.
-        
-        Args:
-            data (dict): User data including email, password, first_name, last_name, role.
-            
-        Returns:
-            Dict[str, Any]: User data without sensitive information and JWT token.
-            
-        Raises:
-            ValueError: If email already exists or validation fails.
         """
         email = data["email"]
-        
         # Check if email already exists
         if self.user_repository.exists_by_email(email):
             raise ValueError("Email already exists")
-        
-        user = User(**data)
-        user = self.user_repository.save(user)
-        
+        user = self.user_repository.create(**data)
         # Generate token for the new user
         token = create_token(str(user.id))
-        
         return {
             "message": "User registered successfully",
             "token": token,
@@ -154,7 +140,7 @@ class AuthFacade:
                 
             # Update password
             user.set_password(new_password)
-            self.user_repository.save(user)
+            self.user_repository.update(user)
             
         except Exception as e:
             raise ValueError("Invalid or expired reset token")
