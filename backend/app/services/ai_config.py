@@ -285,4 +285,4 @@ Si necesitas información específica sobre tus cuentas o transacciones, necesit
             
         except Exception as e:
             logger.error(f"Error en AIService: {str(e)}")
-            raise APIConnectionError(f"Error en el servicio de IA: {str(e)}")
+            raise RuntimeError(f"Error en el servicio de IA: {str(e)}")
