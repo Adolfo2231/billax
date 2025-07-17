@@ -22,7 +22,7 @@ def create_app(config_class=DevelopmentConfig):
     
     # Register routes
     from .api.v1 import api_v1_bp as api_bp
-    app.register_blueprint(api_bp, url_prefix='/api/v1')
+    app.register_blueprint(api_bp)
     
     # Basic route for testing
     @app.route('/')
