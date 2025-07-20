@@ -14,7 +14,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
-    <Router>
+    <Router basename="/billax">
       <div className="App">
         <Routes>
           <Route path="/" element={<Landing />} />
