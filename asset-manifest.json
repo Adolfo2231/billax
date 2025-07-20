@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/billax/static/css/main.084416ec.css",
-    "main.js": "/billax/static/js/main.4f5fcf33.js",
+    "main.js": "/billax/static/js/main.f914adc5.js",
     "index.html": "/billax/index.html",
     "main.084416ec.css.map": "/billax/static/css/main.084416ec.css.map",
-    "main.4f5fcf33.js.map": "/billax/static/js/main.4f5fcf33.js.map"
+    "main.f914adc5.js.map": "/billax/static/js/main.f914adc5.js.map"
   },
   "entrypoints": [
     "static/css/main.084416ec.css",
-    "static/js/main.4f5fcf33.js"
+    "static/js/main.f914adc5.js"
   ]
 }
