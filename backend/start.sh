@@ -24,4 +24,4 @@ exec gunicorn run:app \
     --preload \
     --access-logfile - \
     --error-logfile - \
-    --log-level info 
+    --log-level info # Force redeploy
