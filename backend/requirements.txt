@@ -33,3 +33,4 @@ Werkzeug==3.0.1
 Flask-Migrate
 
 psycopg2-binary==2.9.9
+gunicorn==21.2.0

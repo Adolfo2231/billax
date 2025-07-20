@@ -1,10 +1,16 @@
+import os
 from flask import Flask
-from .config import DevelopmentConfig
+from .config import DevelopmentConfig, ProductionConfig
 from app.extensions import db, migrate, jwt, mail, cors
 
 
-def create_app(config_class=DevelopmentConfig):
-    """Application factory pattern."""
+def create_app(config_class=None):
+    # Auto-detect configuration based on environment
+    if config_class is None:
+        if os.environ.get('FLASK_ENV') == 'production':
+            config_class = ProductionConfig
+        else:
+            config_class = DevelopmentConfig
     app = Flask(__name__)
     
     # Load configuration
@@ -16,9 +22,9 @@ def create_app(config_class=DevelopmentConfig):
     migrate.init_app(app, db)
     jwt.init_app(app)
     mail.init_app(app)
-    cors.init_app(app, resources={
-        r"/api/*": {"origins": "*"}
-    })
+    # Initialize CORS with proper origins
+    from .extensions.cors import init_cors
+    init_cors(app)
     
     # Register routes
     from .api.v1 import api_v1_bp as api_bp

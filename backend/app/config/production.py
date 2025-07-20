@@ -1,3 +1,4 @@
+import os
 from .base import Config
 
 
@@ -10,10 +11,10 @@ class ProductionConfig(Config):
     FLASK_ENV = 'production'
     
     # Security
-    SECRET_KEY = None  # Must be set via environment variable
+    SECRET_KEY = os.environ.get('SECRET_KEY')
     
     # Database (PostgreSQL for production)
-    # SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     
     # Logging
     LOG_LEVEL = 'WARNING'
