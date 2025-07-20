@@ -14,8 +14,8 @@ COPY . .
 ENV FLASK_ENV=production
 ENV PORT=5000
 
-# Exponer el puerto por defecto de Flask
+# Exponer el puerto por defecto
 EXPOSE 5000
 
-# Comando para correr la app con gunicorn
-CMD ["gunicorn", "run:app", "--bind", "0.0.0.0:5000", "--timeout", "120"] 
+# Comando para correr la app con gunicorn usando la variable PORT
+CMD gunicorn run:app --bind 0.0.0.0:${PORT:-5000} --timeout 120 
