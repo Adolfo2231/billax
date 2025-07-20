@@ -4,7 +4,7 @@ services:
     build: ./backend
     container_name: billax-backend
     ports:
-      - "5000:5000"
+      - "5001:5000"
     environment:
       - FLASK_ENV=production
       - DATABASE_URL=${DATABASE_URL}
