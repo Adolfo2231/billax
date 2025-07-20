@@ -10,8 +10,7 @@
 
 ## 🚀 Live Demo
 
-- **Landing Page**: [View Landing Page](https://your-deployed-url.com)
-- **Application**: [Try Billax](https://your-app-url.com)
+- **Landing Page**: [View Landing Page](https://adolfo2231.github.io/billax)
 - **GitHub Repository**: [View Source Code](https://github.com/Adolfo2231/billax)
 
 ## ✨ Key Features
