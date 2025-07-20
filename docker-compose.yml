@@ -1,41 +1,17 @@
 version: '3.8'
 services:
-  db:
-    image: postgres:15
-    container_name: billax-db
-    environment:
-      POSTGRES_USER: billaxuser
-      POSTGRES_PASSWORD: billaxpass
-      POSTGRES_DB: billaxdb
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
   backend:
     build: ./backend
     container_name: billax-backend
     ports:
-      - "5001:5000"
-    volumes:
-      - ./backend:/app
+      - "5000:5000"
     environment:
-      - FLASK_ENV=development
-      - DATABASE_URL=postgresql://billaxuser:billaxpass@db:5432/billaxdb
-    env_file:
-      - backend/.env
-    depends_on:
-      - db
+      - FLASK_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - SECRET_KEY=${SECRET_KEY}
     restart: unless-stopped
-
-  frontend:
-    build: ./frontend
-    container_name: billax-frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
-    restart: unless-stopped 
-
-volumes:
-  postgres_data: 
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3 
