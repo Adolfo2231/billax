@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/billax/static/css/main.084416ec.css",
+    "main.js": "/billax/static/js/main.103e34f0.js",
+    "index.html": "/billax/index.html",
+    "main.084416ec.css.map": "/billax/static/css/main.084416ec.css.map",
+    "main.103e34f0.js.map": "/billax/static/js/main.103e34f0.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.084416ec.css",
+    "static/js/main.103e34f0.js"
+  ]
+}
