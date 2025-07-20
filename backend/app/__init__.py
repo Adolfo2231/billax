@@ -18,7 +18,7 @@ def create_app(config_class=None):
     config_class.init_app(app)
     
     # Initialize extensions (only if database is available)
-    if app.config.get('SQLALCHEMY_DATABASE_URI') and not app.config.get('SQLALCHEMY_DATABASE_URI', '').startswith('sqlite:///'):
+    if app.config.get('SQLALCHEMY_DATABASE_URI'):
         db.init_app(app)
         migrate.init_app(app, db)
     jwt.init_app(app)
