@@ -17,9 +17,10 @@ def create_app(config_class=None):
     app.config.from_object(config_class)
     config_class.init_app(app)
     
-    # Initialize extensions
-    db.init_app(app)
-    migrate.init_app(app, db)
+    # Initialize extensions (only if database is available)
+    if app.config.get('SQLALCHEMY_DATABASE_URI') and not app.config.get('SQLALCHEMY_DATABASE_URI', '').startswith('sqlite:///'):
+        db.init_app(app)
+        migrate.init_app(app, db)
     jwt.init_app(app)
     mail.init_app(app)
     # Initialize CORS with proper origins
