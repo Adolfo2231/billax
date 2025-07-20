@@ -40,4 +40,9 @@ def create_app(config_class=None):
     def health():
         return {'status': 'healthy', 'service': 'billax'}
     
+    @app.route('/ready')
+    def ready():
+        """Readiness check endpoint for Railway."""
+        return {'status': 'ready', 'service': 'billax'}, 200
+    
     return app 
