@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Configuración base de axios
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://billax-backend-production.up.railway.app'  // Railway URL (se actualizará)
+  ? 'https://billax-production.up.railway.app'  // Railway URL
   : 'http://localhost:5001';  // Development
 
 const api = axios.create({
