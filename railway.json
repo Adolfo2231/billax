@@ -7,6 +7,7 @@
     "healthcheckPath": "/ready",
     "healthcheckTimeout": 300,
     "restartPolicyType": "ON_FAILURE",
-    "numReplicas": 1
+    "numReplicas": 1,
+    "startCommand": "cd /app && python -m flask db upgrade && gunicorn run:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120"
   }
 } 
