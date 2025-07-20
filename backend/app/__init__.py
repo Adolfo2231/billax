@@ -45,4 +45,14 @@ def create_app(config_class=None):
         """Readiness check endpoint for Railway."""
         return {'status': 'ready', 'service': 'billax'}, 200
     
+    @app.route('/cors-test')
+    def cors_test():
+        """Test endpoint to verify CORS is working."""
+        return {
+            'status': 'success',
+            'message': 'CORS is working correctly',
+            'service': 'billax',
+            'timestamp': '2025-07-20T18:30:00Z'
+        }, 200
+    
     return app 
