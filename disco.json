@@ -6,7 +6,7 @@
     },
     "backend": {
       "dockerfile": "backend/Dockerfile",
-      "context": "backend"
+      "context": "."
     }
   },
   "deploy": {
