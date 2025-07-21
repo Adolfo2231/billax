@@ -2,15 +2,7 @@
     "version": "1.0",
     "services": {
         "web": {
-            "command": "python run.py",
-            "port": 8000,
-            "image": "default"
-        }
-    },
-    "images": {
-        "default": {
-            "dockerfile": "Dockerfile",
-            "context": "."
+            "port": 8000
         }
     }
 } 
