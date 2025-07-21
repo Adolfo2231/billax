@@ -1,33 +1,18 @@
 {
   "build": {
-    "frontend": {
-      "dockerfile": "frontend/Dockerfile",
-      "context": "frontend"
-    },
     "backend": {
       "dockerfile": "backend/Dockerfile",
       "context": "backend"
     }
   },
   "deploy": {
-    "frontend": {
-      "port": 80,
-      "env": {
-        "REACT_APP_API_BASE_URL": "https://billax.disco.cloud/api"
-      }
-    },
     "backend": {
       "port": 5000,
       "env": {
         "FLASK_ENV": "production",
-        "SECRET_KEY": "{{SECRET_KEY}}",
-        "JWT_SECRET_KEY": "{{JWT_SECRET_KEY}}",
-        "DATABASE_URL": "{{DATABASE_URL}}",
-        "OPENAI_API_KEY": "{{OPENAI_API_KEY}}",
-        "PLAID_CLIENT_ID": "{{PLAID_CLIENT_ID}}",
-        "PLAID_SECRET": "{{PLAID_SECRET}}",
-        "PLAID_ENV": "{{PLAID_ENV}}",
-        "FRONTEND_URL": "https://billax.disco.cloud"
+        "SECRET_KEY": "test-secret-key",
+        "JWT_SECRET_KEY": "test-jwt-secret",
+        "DATABASE_URL": "sqlite:///billax.db"
       }
     }
   }
