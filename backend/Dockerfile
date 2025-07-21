@@ -9,14 +9,14 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copiar requirements.txt primero para aprovechar el cache de Docker
-COPY requirements.txt ./
+COPY backend/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar el código del backend
-COPY . .
+COPY backend/ .
 
-# Exponer el puerto por defecto de Flask
-EXPOSE 5000
+# Exponer el puerto de la aplicación
+EXPOSE 8000
 
 # Comando para correr la app
 CMD ["python", "run.py"] 
