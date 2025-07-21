@@ -1,19 +1,9 @@
 {
-  "build": {
-    "backend": {
-      "dockerfile": "backend/Dockerfile",
-      "context": "backend"
+    "version": "1.0",
+    "services": {
+        "web": {
+            "command": "python run.py",
+            "port": 5000
+        }
     }
-  },
-  "deploy": {
-    "backend": {
-      "port": 5000,
-      "env": {
-        "FLASK_ENV": "production",
-        "SECRET_KEY": "test-secret-key",
-        "JWT_SECRET_KEY": "test-jwt-secret",
-        "DATABASE_URL": "sqlite:///billax.db"
-      }
-    }
-  }
 } 
