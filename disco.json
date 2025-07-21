@@ -2,7 +2,7 @@
     "version": "1.0",
     "services": {
         "web": {
-            "command": "tail -f /dev/null",
+            "command": "python -c 'from app import create_app; app = create_app(); app.run(host=\"0.0.0.0\", port=8000)'",
             "port": 8000,
             "image": "default"
         }
