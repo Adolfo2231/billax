@@ -15,8 +15,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copiar el código del backend
 COPY backend/ .
 
-# Exponer el puerto por defecto de Flask
-EXPOSE 5000
+# Exponer el puerto de la aplicación
+EXPOSE 8000
 
 # Comando para correr la app
 CMD ["python", "run.py"] 
