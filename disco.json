@@ -2,7 +2,7 @@
     "version": "1.0",
     "services": {
         "web": {
-            "command": "echo 'Hello from Disco!'",
+            "command": "tail -f /dev/null",
             "port": 8000,
             "image": "default"
         }
