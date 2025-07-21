@@ -3,7 +3,7 @@
     "services": {
         "web": {
             "command": "python run.py",
-            "port": 8080,
+            "port": 8000,
             "image": "default"
         }
     },
