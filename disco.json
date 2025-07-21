@@ -2,7 +2,7 @@
     "version": "1.0",
     "services": {
         "web": {
-            "command": "bash -c 'python run.py'",
+            "command": "echo 'Hello from Disco!'",
             "port": 8000,
             "image": "default"
         }
