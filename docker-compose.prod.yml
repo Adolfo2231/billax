@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  backend:
+    build: ./backend
+    container_name: billax-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=sqlite:///billax.db
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-dev-jwt-secret}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - PLAID_CLIENT_ID=${PLAID_CLIENT_ID:-}
+      - PLAID_SECRET=${PLAID_SECRET:-}
+      - PLAID_ENV=${PLAID_ENV:-sandbox}
+      - FRONTEND_URL=${FRONTEND_URL:-https://billax.disco.cloud}
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: billax-frontend
+    ports:
+      - "80:80"
+    environment:
+      - REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL:-https://billax.disco.cloud/api}
+    depends_on:
+      - backend
+    restart: unless-stopped 
