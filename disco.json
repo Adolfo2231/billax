@@ -5,12 +5,20 @@
             "command": "python run.py",
             "port": 8000,
             "image": "backend"
+        },
+        "frontend": {
+            "port": 80,
+            "image": "frontend"
         }
     },
     "images": {
         "backend": {
             "dockerfile": "backend/Dockerfile",
             "context": "."
+        },
+        "frontend": {
+            "dockerfile": "frontend/Dockerfile",
+            "context": "frontend"
         }
     }
 } 
