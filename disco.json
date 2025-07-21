@@ -22,6 +22,7 @@
         "FLASK_ENV": "production",
         "SECRET_KEY": "{{SECRET_KEY}}",
         "JWT_SECRET_KEY": "{{JWT_SECRET_KEY}}",
+        "DATABASE_URL": "{{DATABASE_URL}}",
         "OPENAI_API_KEY": "{{OPENAI_API_KEY}}",
         "PLAID_CLIENT_ID": "{{PLAID_CLIENT_ID}}",
         "PLAID_SECRET": "{{PLAID_SECRET}}",

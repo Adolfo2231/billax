@@ -19,7 +19,7 @@ class Config:
     CONTEXT_WINDOW_DAYS = int(os.environ.get('CONTEXT_WINDOW_DAYS', '30'))
     
     # Database Configuration
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///billax.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     FRONTEND_URL = os.environ.get('FRONTEND_URL')
     
