@@ -1,11 +1,19 @@
+import os
 from flask import Flask
-from .config import DevelopmentConfig
+from .config import DevelopmentConfig, ProductionConfig
 from app.extensions import db, migrate, jwt, mail, cors
 
 
-def create_app(config_class=DevelopmentConfig):
+def create_app(config_class=None):
     """Application factory pattern."""
     app = Flask(__name__)
+    
+    # Auto-detect configuration based on environment
+    if config_class is None:
+        if os.environ.get('FLASK_ENV') == 'production' or os.environ.get('DATABASE_URL'):
+            config_class = ProductionConfig
+        else:
+            config_class = DevelopmentConfig
     
     # Load configuration
     app.config.from_object(config_class)
@@ -16,9 +24,16 @@ def create_app(config_class=DevelopmentConfig):
     migrate.init_app(app, db)
     jwt.init_app(app)
     mail.init_app(app)
-    cors.init_app(app, resources={
-        r"/api/*": {"origins": "*"}
-    })
+    
+    # Configure CORS based on environment
+    if config_class == ProductionConfig:
+        cors.init_app(app, resources={
+            r"/api/*": {"origins": [app.config.get('FRONTEND_URL')]}
+        })
+    else:
+        cors.init_app(app, resources={
+            r"/api/*": {"origins": "*"}
+        })
     
     # Register routes
     from .api.v1 import api_v1_bp as api_bp
