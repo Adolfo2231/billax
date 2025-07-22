@@ -1,0 +1,7 @@
+__pycache__
+*.pyc
+instance/
+migrations/
+*.db
+.dockerignore
+Dockerfile 
